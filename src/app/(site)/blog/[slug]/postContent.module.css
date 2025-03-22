@@ -1,0 +1,38 @@
+/* postContent.module.css */
+.postContent {
+  padding-top: 1rem;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #0D1214;
+  font-size: 1rem;
+}
+
+.postContent h1, .postContent h2, .postContent h3 {
+  font-weight: 900;
+  margin-top: 0.875rem;
+}
+
+.postContent h1 {
+  font-size: 2rem;
+}
+
+.postContent h2 {
+  font-size: 1.625rem;
+}
+
+.postContent p {
+  margin-bottom: 1rem; /* Margem maior após parágrafos */
+}
+
+.postContent img {
+  max-width: 100%;
+  height: auto;
+}
+
+.postContent ul li{
+  margin: 0.875rem 0 0 3.5rem
+}
+
+.postContent ul li::marker {
+  color: #d90000; /* Altera a cor do marcador (bullet) */
+}
