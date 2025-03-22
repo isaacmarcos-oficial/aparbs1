@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { hostname: "res.cloudinary.com" },
-      { hostname: "www.aparbs.com.br" }
+      { hostname: "www.aparbs.com.br" },
+      { hostname: "www.datocms-assets.com" },
     ]
   },
   async redirects() {

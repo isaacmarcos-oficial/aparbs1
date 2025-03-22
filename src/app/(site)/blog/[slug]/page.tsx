@@ -1,27 +1,30 @@
-import Image from "next/image";
-import { contentPost } from "./ContextPost";
-import styles from "./postContent.module.css";
+import { client } from "@/lib/datoClient";
+import { GET_POST_BY_ID } from "@/lib/datoQueries";
+import { DatoResponse } from "@/types/postTypes";
+import PostContent from "./ContentPost";
 
-export default function PostPage() {
+export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
 
-  return (
-    <div className="flex flex-col items-center w-full p-8 gap-4 ">
-      <div className="flex flex-col gap-6 max-w-screen-lg items-center justify-center">
+  let post = null;
+
+  try {
+    const data: DatoResponse = await client.request(GET_POST_BY_ID, { slug });
+    post = data?.post || null;
+  } catch (error) {
+    console.error("Erro ao buscar o post:", error);
+  }
+
+  if (!post) {
+    return (
+      <div className="flex flex-col items-center w-full p-8 gap-4">
         <h2 className="text-3xl font-extrabold text-center text-[#d90000] mt-5">
-          Reparo de ar condicionado para carros: Entenda custos, serviços e muito mais
+          Post não encontrado
         </h2>
-        <Image
-          alt="Post 1"
-          src="https://www.aparbs.com.br/_next/image?url=https%3A%2F%2Fwww.datocms-assets.com%2F141952%2F1725906402-9ba94b1e-23da-4e2c-95fe-82e420c5214c-troca-de-filtro-de-ar-condicionado.jpg&w=640&q=75"
-          width={1000}
-          height={200}
-          style={{ objectFit: "cover", maxHeight: "300px", minWidth: "300px", overflow: "hidden", borderRadius: "12px" }}
-        />
-        <div
-          className={styles.postContent}
-          dangerouslySetInnerHTML={{ __html: contentPost }}
-        />
       </div>
-    </div>
-  )
+    );
+  }
+
+  // Passa os dados para o Client Component
+  return <PostContent post={post} />;
 }
