@@ -14,7 +14,13 @@ export default function OfficeModal({ title, serviceIcon, description, checklist
 
   return (
     <Dialog>
-      <DialogTrigger className="gap-3 flex cursor-pointer" asChild>
+      <DialogTrigger
+        className="gap-3 flex cursor-pointer"
+        asChild role="button"
+        aria-haspopup="dialog"
+        aria-expanded="false"
+        aria-controls="dialog-element"
+      >
         <div className="">
           <div className="flex items-center justify-center text-[#d90000] hover:text-white hover:bg-[#d90000] w-20 h-20 border-2 border-[#d90000] rounded transition-all text-3xl">
             {serviceIcon}
@@ -30,7 +36,7 @@ export default function OfficeModal({ title, serviceIcon, description, checklist
         </div>
       </DialogTrigger>
 
-      <DialogContent color="gray.800" >
+      <DialogContent id="dialog-element" color="gray.800" >
         <DialogTitle className="text-[#d90000] font-bold">
           {title}
         </DialogTitle>
