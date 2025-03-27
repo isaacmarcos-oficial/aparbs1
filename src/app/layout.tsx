@@ -16,6 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
+      <head>
+        <link rel="icon" href="/favicon.svg" />
+      </head>
       <body className="">
         <SidebarProvider>
           <div className="flex flex-col w-full">

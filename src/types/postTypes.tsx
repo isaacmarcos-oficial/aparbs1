@@ -9,7 +9,17 @@ export interface Post {
   content: string;
 }
 
+export interface Partner {
+  id: string;
+  business: string;
+  image: {
+    url: string
+  }
+}
+
 export interface DatoResponse {
   allPosts: Post[];
   post: Post;
+  allPartners: Partner[]
 }
+

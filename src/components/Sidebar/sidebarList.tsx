@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SidebarMenuButton } from "../ui/sidebar";
-import { BriefcaseBusiness, Caravan, Home, MapPinned, Newspaper } from "lucide-react";
+import { BriefcaseBusiness, Caravan, Home, Link2, MapPinned, Newspaper } from "lucide-react";
 
 const menuItems = [
   {
@@ -31,6 +31,12 @@ const menuItems = [
     title: "Trabalhe conosco",
     icon: BriefcaseBusiness,
     url: "/trabalhe-conosco",
+    target: "_blank",
+  },
+  {
+    title: "Links rápidos",
+    icon: Link2,
+    url: "/bio",
     target: "_self",
   }
 ]

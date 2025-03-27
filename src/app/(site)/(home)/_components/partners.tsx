@@ -1,36 +1,17 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Skeleton } from "@/components/ui/skeleton";
+import { GET_PARTNERS } from "@/lib/datoQueries";
+import { client } from "@/lib/datoClient";
+import { DatoResponse, Partner } from "@/types/postTypes";
 
-interface Partner {
-  id: string;
-  name: string;
-  url: string;
-}
+export default async function Partners() {
+  let partners: Partner[] = [];
 
-export default function Partners() {
-  const [partners, setPartners] = useState<Partner[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchPartners() {
-      try {
-        const response = await fetch("/api/partners");
-        if (!response.ok) throw new Error("Erro ao buscar parceiros.");
-
-        const data = await response.json();
-        setPartners(data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchPartners();
-  }, []);
+  try {
+    const data: DatoResponse = await client.request(GET_PARTNERS);
+    partners = data?.allPartners || [];
+  } catch (error) {
+    console.error("Erro ao buscar partners:", error);
+  }
 
   return (
     <div className="flex w-full items-center justify-center py-12">
@@ -40,26 +21,24 @@ export default function Partners() {
         </h2>
         <div className="flex flex-col w-full items-center justify-center">
           <div className="flex flex-wrap gap-8 mx-4 items-center justify-center">
-            {loading ? (
-              <Skeleton />
-            ) : partners.length > 0 ? (
-              partners.map((partner) => (
-                <div key={partner.id} className="gap-8">
-                  <Image
-                    width={80}
-                    height={40}
-                    quality={40}
-                    alt={partner.name}
-                    src={partner.url}
-                    loading="lazy"
-                    style={{ objectFit: "contain" }}
-                    className="grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all"
-                  />
-                </div>
-              ))
-            ) : (
-              <p>Nenhum parceiro encontrado.</p>
-            )}
+            {partners.map((partner) => (
+              <div key={partner.id} className="gap-8">
+                <Image
+                  width={80}
+                  height={40}
+                  quality={40}
+                  alt={partner.business}
+                  src={partner.image.url}
+                  loading="lazy"
+                  style={{
+                    objectFit: "contain",
+                    width: "auto",
+                    height: "25px"
+                  }}
+                  className="grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </div>
