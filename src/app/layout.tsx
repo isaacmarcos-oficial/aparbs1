@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Header } from "@/components/header";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { Footer } from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "APARBS Soluções Automotivas",
@@ -20,15 +17,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" />
       </head>
       <body className="">
-        <SidebarProvider>
-          <div className="flex flex-col w-full">
-            <Header />
-            <div className="flex flex-col mt-16 w-full">
-              {children}
-            </div>
-            <Footer />
-          </div>
-        </SidebarProvider>
+        {children}
       </body>
     </html>
   );
