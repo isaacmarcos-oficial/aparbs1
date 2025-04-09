@@ -39,7 +39,6 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
         body: JSON.stringify(formData)
       });
 
-      console.log('Response:', response);
 
       if (!response.ok) {
         throw new Error('Erro ao criar cupom');
@@ -95,7 +94,7 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
           throw new Error('Erro ao importar registro');
         }
       }
-
+      setSuccessMessage('Registros importados com sucesso!');
       // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -156,7 +155,7 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
               className=""
             >
               <Upload className="h-4 w-4" />
-              Importar Planilha
+              Importar
             </Button>
           </div>
 

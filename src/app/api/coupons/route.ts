@@ -30,7 +30,6 @@ function calculateCouponCount(purchaseValue: number, hasInstagramPost: boolean):
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    console.log('Data:', data);
 
     if (
       !data.clientCode ||
@@ -58,7 +57,6 @@ export async function POST(request: Request) {
       campaignId: data.campaignId || null,
     };
 
-    console.log("Dados do cupom:", couponData);
 
     const createdCoupon = await prisma.coupon.create({
       data: couponData,

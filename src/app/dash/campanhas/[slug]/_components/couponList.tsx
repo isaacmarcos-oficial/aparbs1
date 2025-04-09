@@ -62,7 +62,7 @@ export function CouponList({
             className=""
           >
             <Download size={16} className="mr-2" />
-            Exportar CSV
+            Exportar
           </Button>
         </div>
       </div>
@@ -149,7 +149,7 @@ export function CouponList({
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex">
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                        <DropdownMenuTrigger asChild className='cursor-pointer'>
                           <MoreVerticalIcon size={20} />
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>

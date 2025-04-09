@@ -8,7 +8,7 @@ import Link from "next/link";
 
 export default function Bio() {
   return (
-    <div className="flex flex-col items-center w-full bg-[url(/Fachada.jpg)] bg-no-repeat bg-cover bg-[#000000e9] bg-blend-overlay -mb-12 px-6">
+    <div className="flex flex-col items-center justify-center w-screen h-screen bg-[url(/Fachada.jpg)] bg-no-repeat bg-cover bg-[#000000e9] bg-blend-overlay px-6">
       <div className="flex items-center flex-col w-full max-w-lg bg-[#d90000] m-10 p-10 rounded-3xl">
         <div className="bg-white flex items-center justify-center p-2 rounded-full shadow-lg">
           <Image

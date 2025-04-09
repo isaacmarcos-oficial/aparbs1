@@ -18,7 +18,6 @@ export async function POST(request: Request) {
 
   try {
     data = await request.json();
-    console.log("Dados recebidos:", data);
 
     const { name, description, startDate, endDate, isActive } = data;
 
@@ -31,7 +30,6 @@ export async function POST(request: Request) {
         isActive: isActive !== undefined && isActive !== null ? isActive : true,
       },
     });
-    console.log("Campanha criada:", createdCampaign);
     
     // Retorna a resposta com status 201 (Created)
     return NextResponse.json(createdCampaign, { status: 201 });
@@ -44,7 +42,6 @@ export async function POST(request: Request) {
 export async function GET() {
   try {
     const campaigns = await prisma.campaign.findMany()
-    console.log("Campanhas encontradas:", campaigns);
     return NextResponse.json({ campaigns });
   } catch (error) {
     console.error("Erro ao buscar as campanhas:", error);

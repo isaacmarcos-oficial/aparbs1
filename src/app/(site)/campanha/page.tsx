@@ -65,35 +65,33 @@ export default function Page() {
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
 
-      <Card className="p-4">
-        {!loading && hasSearched && coupons.length === 0 && (
-          <div className="text-center">
-            Nenhum cupom encontrado para o CPF informado.
-          </div>
-        )}
+      {!loading && hasSearched && coupons.length === 0 && (
+        <Card className="text-center p-4">
+          Nenhum cupom encontrado para o CPF informado.
+        </Card>
+      )}
 
 
-        {coupons.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {coupons.map((coupon) => (
-              <Card key={coupon.id} className="p-4 space-y-2">
-                <h3 className="font-semibold text-gray-700">{coupon.clientName}</h3>
-                <p className="text-sm text-gray-600">OS/VB: {coupon.orderNumber}</p>
-                <div className="flex flex-wrap gap-2">
-                  {coupon.couponNumber.map((num) => (
-                    <span key={num} className="bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold">
-                      <Ticket className="inline-block w-4 h-4 mr-1" /> {num}
-                    </span>
-                  ))}
-                </div>
-                {coupon.isWinner && (
-                  <p className="text-sm font-bold text-yellow-600">🏆 Número premiado!</p>
-                )}
-              </Card>
-            ))}
-          </div>
-        )}
-      </Card>
+      {coupons.length > 0 && (
+        <div className="flex flex-col gap-4">
+          {coupons.map((coupon) => (
+            <Card key={coupon.id} className="p-4 space-y-2">
+              <h3 className="font-semibold text-gray-700">{coupon.clientName}</h3>
+              <p className="text-sm text-gray-600">OS/VB: {coupon.orderNumber}</p>
+              <div className="grid grid-cols-3 gap-2">
+                {coupon.couponNumber.map((num) => (
+                  <span key={num} className="bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold">
+                    <Ticket className="inline-block w-4 h-4 mr-1" /> {num}
+                  </span>
+                ))}
+              </div>
+              {coupon.isWinner && (
+                <p className="text-sm font-bold text-yellow-600">🏆 Número premiado!</p>
+              )}
+            </Card>
+          ))}
+        </div>
+      )}
 
     </div>
   )

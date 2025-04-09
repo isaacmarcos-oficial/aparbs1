@@ -38,7 +38,6 @@ async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
   setLoading(true);
   setError(null);
-  console.log("Form data:", formData);
 
   try {
     const response = await fetch("/api/campaigns", {
