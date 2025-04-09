@@ -70,9 +70,15 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url)
+  const cpf = searchParams.get('cpf')
+
   try {
-    const coupons = await prisma.coupon.findMany();
+    const coupons = await prisma.coupon.findMany({
+      where: cpf ? { cpf } : undefined,
+      orderBy: { registrationDate: 'desc' },
+    })
     return NextResponse.json(coupons);
   } catch (error) {
     console.error("Erro ao buscar os cupons:", error);
