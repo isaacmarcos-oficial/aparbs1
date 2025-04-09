@@ -3,10 +3,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ArrowUpDown, Eye, MoreHorizontal, Target } from "lucide-react"
-import { Campaings } from "./campaignData"
 import Link from "next/link"
+import { Campaign } from "@/types/campaignTypes"
 
-export const columns: ColumnDef<Campaings>[] = [
+export const columns: ColumnDef<Campaign>[] = [
   {
     id: "select",
     header: ({ table }) => (
