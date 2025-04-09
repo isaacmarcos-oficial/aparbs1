@@ -27,16 +27,39 @@ import {
 
 import { ChevronDown } from "lucide-react"
 import { columns } from "./campaignColumns"
-import { campaignsMock } from "./campaignData"
+import { Campaign } from "@/types/campaignTypes"
 
 export function CampaignTable() {
+  const [campaignData, setCampaignData] = React.useState<Campaign[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const [error, setError] = React.useState<string>("");
+
+  React.useEffect(() => {
+    fetch("/api/campaigns")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Erro ao buscar campanhas");
+        }
+        return res.json();
+      })
+      .then((data) => {
+        // Considerando que sua API retorne um objeto { campaigns: [...] }
+        setCampaignData(data.campaigns || data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
-    data: campaignsMock,
+    data: campaignData,
     columns,
     state: {
       sorting,
@@ -54,14 +77,17 @@ export function CampaignTable() {
     getFilteredRowModel: getFilteredRowModel(),
   })
 
+  if (loading) return <div>Carregando campanhas...</div>;
+  if (error) return <div>{error}</div>;
+
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
           placeholder="Buscar campanha"
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

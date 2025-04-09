@@ -6,6 +6,7 @@ import {
   SearchIcon,
   SettingsIcon,
   Target,
+  Users
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -34,6 +35,11 @@ const data = {
       url: "/dash/campanhas",
       icon: Target,
     },
+    {
+      title: "Usuários",
+      url: "/dash/usuarios",
+      icon: Users
+    }
   ],
   navSecondary: [
     {

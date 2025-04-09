@@ -1,37 +1,71 @@
 import React, { useState, useRef } from 'react';
 import { Ticket, Upload, AlertCircle } from 'lucide-react';
-import { importFromFile } from '@/utils/fileImport';
 import { CouponFormDataType } from '@/types/campaignTypes';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { downloadCouponTemplate } from '@/utils/downloadTemplate';
+import { importFromFile } from '@/utils/importFromFile';
 
 interface CouponFormProps {
-  onSubmit: (data: CouponFormDataType) => void;
+  onSubmit?: (formData: CouponFormDataType) => void; // <-- aqui
+  campaignId: string
 }
 
-export function CouponForm({ onSubmit }: CouponFormProps) {
+export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
   const [formData, setFormData] = useState<CouponFormDataType>({
+    campaignId: campaignId,
     clientCode: '',
+    cpf: '',
     clientName: '',
     orderNumber: '',
     purchaseValue: 0,
-    hasInstagramPost: false
+    hasInstagramPost: false,
   });
   const [importError, setImportError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
-    setFormData({
-      clientCode: '',
-      clientName: '',
-      orderNumber: '',
-      purchaseValue: 0,
-      hasInstagramPost: false
-    });
+
+    try {
+      const response = await fetch('/api/coupons', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      console.log('Response:', response);
+
+      if (!response.ok) {
+        throw new Error('Erro ao criar cupom');
+      }
+
+      const createdCoupon = await response.json();
+      setSuccessMessage('Cupom registrado com sucesso!');
+      setFormData({
+        campaignId: campaignId,
+        clientCode: '',
+        cpf: '',
+        clientName: '',
+        orderNumber: '',
+        purchaseValue: 0,
+        hasInstagramPost: false
+      });
+
+      // Se houver callback para atualizar uma lista em um componente pai
+      if (onSubmit) {
+        onSubmit(createdCoupon);
+      }
+    } catch (error: unknown) {
+      console.error(error);
+      setSuccessMessage('');
+      setImportError(error instanceof Error ? error.message : 'Erro ao registrar cupom');
+    }
   };
 
   const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,12 +74,27 @@ export function CouponForm({ onSubmit }: CouponFormProps) {
 
     try {
       setImportError(null);
-      const data = await importFromFile(file);
+      const data = await importFromFile(file, campaignId);
 
-      // Process each imported record
-      data.forEach(record => {
-        onSubmit(record);
-      });
+      for (const record of data) {
+        const fullData = {
+          ...record,
+          campaignId: campaignId,
+          hasInstagramPost: false // sempre vem false por padrão
+        };
+
+        const response = await fetch('/api/coupons', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(fullData)
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao importar registro');
+        }
+      }
 
       // Reset file input
       if (fileInputRef.current) {
@@ -71,10 +120,29 @@ export function CouponForm({ onSubmit }: CouponFormProps) {
         </div>
       )}
 
+      {successMessage && (
+        <div className="bg-green-50 border-l-4 border-green-400 p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <AlertCircle className="h-5 w-5 text-green-400" />
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-green-700">{successMessage}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Card className="p-6 ">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">Novo Registro</h2>
-          <div className="relative">
+          <div className="flex relative gap-2 items-center">
+            <Button
+              size="sm"
+              onClick={downloadCouponTemplate}
+            >
+              Baixar Modelo
+            </Button>
             <Input
               type="file"
               ref={fileInputRef}
@@ -83,6 +151,7 @@ export function CouponForm({ onSubmit }: CouponFormProps) {
               className="hidden"
             />
             <Button
+              size="sm"
               onClick={() => fileInputRef.current?.click()}
               className=""
             >
@@ -90,6 +159,7 @@ export function CouponForm({ onSubmit }: CouponFormProps) {
               Importar Planilha
             </Button>
           </div>
+
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -107,7 +177,20 @@ export function CouponForm({ onSubmit }: CouponFormProps) {
               />
             </div>
 
-            <div className="md:col-span-3">
+            <div className="md:col-span-1">
+              <Label className="">
+                CPF
+              </Label>
+              <Input
+                type="text"
+                required
+                className="w-full p-2 border rounded-md"
+                value={formData.cpf}
+                onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+              />
+            </div>
+
+            <div className="md:col-span-2">
               <Label className="">
                 Nome do Cliente
               </Label>

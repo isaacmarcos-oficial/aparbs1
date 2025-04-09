@@ -56,13 +56,14 @@ export function CouponList({
           <h3 className="text-xs font-semibold text-muted-foreground uppercase">
             {uniqueOrders.length} pedidos • {coupons.length} cupons
           </h3>
-          <button
+          <Button
+            size="sm"
             onClick={handleExportCSV}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className=""
           >
             <Download size={16} className="mr-2" />
             Exportar CSV
-          </button>
+          </Button>
         </div>
       </div>
       <div className="overflow-x-auto">
@@ -90,7 +91,7 @@ export function CouponList({
               <th className="p-3 px-6">
                 Registro
               </th>
-              
+
               <th className="p-3 px-6">
                 Ações
               </th>
@@ -137,11 +138,13 @@ export function CouponList({
                       className="inline-flex items-center text-blue-600 hover:text-blue-900"
                     >
                       <Ticket size={16} className="mr-1" />
-                      <span className="font-medium">{order.totalCoupons}</span>
+                      <span className="font-medium">
+                        {orderCoupons.reduce((total, coupon) => total + coupon.couponNumber.length, 0)}
+                      </span>
                     </Button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {order.registrationDate.toLocaleDateString()}
+                    {order.registrationDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex">

@@ -1,7 +1,7 @@
 import { CouponType } from "@/types/campaignTypes";
 
 export function exportToCSV(coupons: CouponType[], filename: string) {
-  // Define CSV headers
+  // Cabeçalhos do CSV
   const headers = [
     'Código do Cliente',
     'Nome do Cliente',
@@ -9,33 +9,33 @@ export function exportToCSV(coupons: CouponType[], filename: string) {
     'Valor da Compra',
     'Post no Instagram',
     'Data de Registro',
-    'Nº do Cupom',
-    'Total de Cupons',
+    'Nº(s) do Cupom',
+    'Quantidade de Cupons',
     'Status',
     'Ganhador'
   ];
 
-  // Transform data to CSV format
+  // Transformar dados dos cupons para o formato do CSV
   const csvData = coupons.map(coupon => [
     coupon.clientCode,
     coupon.clientName,
     coupon.orderNumber,
     coupon.purchaseValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
     coupon.hasInstagramPost ? 'Sim' : 'Não',
-    new Date(coupon.registrationDate).toLocaleDateString(),
-    `${coupon.couponNumber}/${coupon.totalCoupons}`,
-    coupon.totalCoupons,
+    new Date(coupon.registrationDate).toLocaleDateString('pt-BR'),
+    coupon.couponNumber.join(' / '), // Agora é array
+    coupon.couponNumber.length,       // Quantidade de cupons
     coupon.isActive ? 'Ativo' : 'Inativo',
     coupon.isWinner ? 'Sim' : 'Não'
   ]);
 
-  // Combine headers and data
+  // Montar o conteúdo CSV
   const csvContent = [
     headers.join(','),
     ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))
   ].join('\n');
 
-  // Create and trigger download
+  // Criar e disparar o download
   const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);

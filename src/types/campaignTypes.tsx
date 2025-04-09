@@ -1,5 +1,6 @@
 export interface CouponType {
   id: string;
+  cpf: string;
   clientCode: string;
   clientName: string;
   orderNumber: string;
@@ -8,11 +9,12 @@ export interface CouponType {
   registrationDate: Date;
   isWinner: boolean;
   isActive: boolean;
-  couponNumber: number;
-  totalCoupons: number;
+  couponNumber: number[];
 }
 
 export interface CouponFormDataType {
+  campaignId: string
+  cpf: string;
   clientCode: string;
   clientName: string;
   orderNumber: string;
@@ -25,4 +27,18 @@ export interface SearchFiltersType {
   clientName: string;
   orderNumber: string;
   couponNumber: string;
+}
+
+export interface Campaign {
+  id: string;
+  title: string;
+  status: "finished" | "ongoing" | "programmed";
+  name: string;
+  description?: string;
+  startDate: string; // ou Date se preferir
+  endDate: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  coupons: CouponType[];
 }

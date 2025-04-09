@@ -1,7 +1,7 @@
 import { CouponFormDataType } from '@/types/campaignTypes';
 import { read, utils } from 'xlsx';
 
-export async function importFromFile(file: File): Promise<CouponFormDataType[]> {
+export async function importFromFile(file: File, campaignId: string): Promise<CouponFormDataType[]> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
@@ -11,27 +11,28 @@ export async function importFromFile(file: File): Promise<CouponFormDataType[]> 
         const workbook = read(data, { type: 'binary' });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
-        
-        const jsonData = utils.sheet_to_json<Record<string, string | number | boolean | undefined>>(worksheet);
-        
-        const mappedData: CouponFormDataType[] = jsonData.map(row => {
-          // Try different possible column names
-          const clientCode = row['Código do Cliente'] || row['Codigo do Cliente'] || row['codigo_cliente'] || row['CÓDIGO DO CLIENTE'];
-          const clientName = row['Nome do Cliente'] || row['nome_cliente'] || row['NOME DO CLIENTE'];
-          const orderNumber = row['Nº OS/VB'] || row['N OS/VB'] || row['numero_os'] || row['Nº OS ou VB'] || row['OS/VB'];
-          const purchaseValue = row['Valor'] || row['VALOR'] || row['valor_compra'] || row['Valor da Compra'] || 0;
-          const hasInstagramPost = row['Post Instagram'] || row['INSTAGRAM'] || row['instagram'] || false;
 
-          if (!clientCode || !clientName || !orderNumber) {
+        const jsonData = utils.sheet_to_json<Record<string, string | number | boolean | undefined>>(worksheet);
+
+        const mappedData: CouponFormDataType[] = jsonData.map(row => {
+          const clientCode = row['Código do Cliente'] || row['codigo_cliente'];
+          const cpf = row['CPF'] || '';
+          const clientName = row['Nome do Cliente'] || row['nome_cliente'];
+          const orderNumber = row['Nº OS/VB'] || row['numero_os'];
+          const purchaseValue = row['Valor'] || 0;
+
+          if (!clientCode || !clientName || !orderNumber || !cpf) {
             throw new Error('Formato de arquivo inválido. Verifique se as colunas estão corretas.');
           }
 
           return {
+            campaignId,
             clientCode: String(clientCode),
             clientName: String(clientName),
             orderNumber: String(orderNumber),
-            purchaseValue: Number(purchaseValue) || 0,
-            hasInstagramPost: Boolean(hasInstagramPost)
+            cpf: String(cpf),
+            purchaseValue: Number(purchaseValue),
+            hasInstagramPost: false, // fixo
           };
         });
 

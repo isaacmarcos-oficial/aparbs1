@@ -18,7 +18,7 @@ export default function DashLayout({
           <DashSidebar variant="inset" />
           <SidebarInset>
             <SiteHeader />
-            <Card className="flex flex-1 flex-col m-6 p-4">
+            <Card className="flex flex-1 flex-col m-6 p-10">
               {children}
             </Card>
           </SidebarInset>

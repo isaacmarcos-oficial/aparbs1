@@ -9,16 +9,6 @@ import { CouponFormDataType, CouponType, SearchFiltersType } from "@/types/campa
 
 const usedCouponNumbers = new Set<number>();
 
-function generateUniqueCouponNumber(): number {
-  let number: number;
-  do {
-    number = Math.floor(Math.random() * 90000) + 10000;
-  } while (usedCouponNumbers.has(number));
-
-  usedCouponNumbers.add(number);
-  return number;
-}
-
 function calculateTotalCoupons(purchaseValue: number, hasInstagramPost: boolean): number {
   let totalCoupons = 1;
   if (purchaseValue > 500) totalCoupons += 2;
@@ -27,8 +17,14 @@ function calculateTotalCoupons(purchaseValue: number, hasInstagramPost: boolean)
   return totalCoupons;
 }
 
-export function CouponClient() {
-  const [coupons, setCoupons] = useState<CouponType[]>([]);
+export function CouponClient({
+  coupons: initialCoupons,
+  campaignId
+}: {
+  coupons: CouponType[];
+  campaignId: string;
+}) {
+  const [coupons, setCoupons] = useState<CouponType[]>(initialCoupons || []);
   const [filters, setFilters] = useState<SearchFiltersType>({
     clientCode: '',
     clientName: '',
@@ -36,84 +32,134 @@ export function CouponClient() {
     couponNumber: ''
   });
 
+  const generateCouponNumbers = (total: number): number[] => {
+    const result: number[] = [];
+    while (result.length < total) {
+      const number = Math.floor(Math.random() * 90000) + 10000;
+      if (!usedCouponNumbers.has(number)) {
+        usedCouponNumbers.add(number);
+        result.push(number);
+      }
+    }
+    return result;
+  };
+
   const handleCreateCoupon = (formData: CouponFormDataType) => {
     const totalCoupons = calculateTotalCoupons(formData.purchaseValue, formData.hasInstagramPost);
-    const newCoupons: CouponType[] = Array.from({ length: totalCoupons }, () => ({
+    const numbers = generateCouponNumbers(totalCoupons);
+
+    const newCoupon: CouponType = {
       id: crypto.randomUUID(),
       registrationDate: new Date(),
       isWinner: false,
       isActive: true,
-      couponNumber: generateUniqueCouponNumber(),
-      totalCoupons,
+      couponNumber: numbers,
       ...formData
-    }));
+    };
 
-    setCoupons(prev => [...prev, ...newCoupons]);
+    setCoupons(prev => [...prev, newCoupon]);
   };
 
-  const handleDeleteCoupon = (id: string) => {
+  const handleDeleteCoupon = async (id: string) => {
     const couponToDelete = coupons.find(c => c.id === id);
     if (!couponToDelete) return;
 
-    setCoupons(prev => prev.filter(c =>
-      !(c.clientCode === couponToDelete.clientCode &&
-        c.orderNumber === couponToDelete.orderNumber)
-    ));
+    try {
+      const res = await fetch(`/api/coupons/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error("Erro ao deletar cupom");
+
+      setCoupons(prev => prev.filter(c =>
+        !(c.clientCode === couponToDelete.clientCode &&
+          c.orderNumber === couponToDelete.orderNumber)
+      ));
+    } catch (error) {
+      console.error("Erro ao excluir cupom:", error);
+    }
   };
 
-  const handleToggleWinner = (id: string) => {
-    setCoupons(prev => prev.map(coupon => {
-      if (coupon.id === id) return { ...coupon, isWinner: !coupon.isWinner };
-      return coupon.isWinner ? { ...coupon, isWinner: false } : coupon;
-    }));
+  const handleToggleWinner = async (id: string) => {
+    const coupon = coupons.find(c => c.id === id);
+    if (!coupon) return;
+
+    const newIsWinner = !coupon.isWinner;
+
+    try {
+      const res = await fetch(`/api/coupons/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isWinner: newIsWinner }),
+      });
+
+      if (!res.ok) throw new Error("Erro ao atualizar isWinner");
+
+      const updated = await res.json();
+
+      setCoupons(prev => prev.map(c =>
+        c.id === id ? updated : (newIsWinner ? { ...c, isWinner: false } : c)
+      ));
+    } catch (error) {
+      console.error("Erro ao atualizar ganhador:", error);
+    }
   };
 
-  const handleToggleActive = (id: string) => {
+  const handleToggleActive = async (id: string) => {
     const couponToToggle = coupons.find(c => c.id === id);
     if (!couponToToggle) return;
 
-    setCoupons(prev => prev.map(coupon =>
-      (coupon.clientCode === couponToToggle.clientCode &&
-        coupon.orderNumber === couponToToggle.orderNumber)
-        ? { ...coupon, isActive: !coupon.isActive }
-        : coupon
-    ));
+    const newIsActive = !couponToToggle.isActive;
+
+    try {
+      const res = await fetch(`/api/coupons/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isActive: newIsActive }),
+      });
+
+      if (!res.ok) throw new Error("Erro ao atualizar isActive");
+
+      const updated = await res.json();
+
+      setCoupons(prev =>
+        prev.map(c =>
+          (c.clientCode === couponToToggle.clientCode && c.orderNumber === couponToToggle.orderNumber)
+            ? updated
+            : c
+        )
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar ativo:", error);
+    }
   };
 
-  const handleUpdateInstagramPost = (orderNumber: string, clientCode: string) => {
-    const existingCoupons = coupons.filter(
+  const handleUpdateInstagramPost = async (orderNumber: string, clientCode: string) => {
+    const targetCoupon = coupons.find(
       c => c.orderNumber === orderNumber && c.clientCode === clientCode
     );
 
-    if (!existingCoupons.length || existingCoupons[0].hasInstagramPost) return;
+    if (!targetCoupon || targetCoupon.hasInstagramPost) return;
 
-    const firstCoupon = existingCoupons[0];
-    const currentTotal = firstCoupon.totalCoupons;
-    const newTotal = calculateTotalCoupons(firstCoupon.purchaseValue, true);
-    const additionalCoupons = newTotal - currentTotal;
-    if (additionalCoupons <= 0) return;
+    try {
+      const res = await fetch(`/api/coupons/${targetCoupon.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-    const newCoupons: CouponType[] = Array.from({ length: additionalCoupons }, () => ({
-      id: crypto.randomUUID(),
-      clientCode: firstCoupon.clientCode,
-      clientName: firstCoupon.clientName,
-      orderNumber: firstCoupon.orderNumber,
-      purchaseValue: firstCoupon.purchaseValue,
-      hasInstagramPost: true,
-      registrationDate: new Date(),
-      isWinner: false,
-      isActive: firstCoupon.isActive,
-      couponNumber: generateUniqueCouponNumber(),
-      totalCoupons: newTotal
-    }));
+      if (!res.ok) throw new Error("Erro ao atualizar cupom no backend.");
 
-    const updatedCoupons = coupons.map(coupon =>
-      (coupon.orderNumber === orderNumber && coupon.clientCode === clientCode)
-        ? { ...coupon, hasInstagramPost: true, totalCoupons: newTotal }
-        : coupon
-    );
+      const updatedCoupon = await res.json();
 
-    setCoupons([...updatedCoupons, ...newCoupons]);
+      // Atualiza o estado local com os dados retornados do servidor
+      setCoupons(prev =>
+        prev.map(c =>
+          c.id === updatedCoupon.id ? updatedCoupon : c
+        )
+      );
+    } catch (err) {
+      console.error("Erro ao marcar cupom com Instagram:", err);
+    }
   };
 
   const filteredCoupons = coupons.filter(coupon => {
@@ -121,7 +167,7 @@ export function CouponClient() {
     const matchesClientName = coupon.clientName.toLowerCase().includes(filters.clientName.toLowerCase());
     const matchesOrderNumber = coupon.orderNumber.toLowerCase().includes(filters.orderNumber.toLowerCase());
     const matchesCouponNumber = filters.couponNumber
-      ? coupon.couponNumber.toString() === filters.couponNumber
+      ? coupon.couponNumber.includes(Number(filters.couponNumber))
       : true;
 
     return matchesClientCode && matchesClientName && matchesOrderNumber && matchesCouponNumber;
@@ -129,7 +175,7 @@ export function CouponClient() {
 
   return (
     <div className="space-y-8">
-      <CouponForm onSubmit={handleCreateCoupon} />
+      <CouponForm campaignId={campaignId} onSubmit={handleCreateCoupon} />
       <SearchBar filters={filters} onFiltersChange={setFilters} />
 
       {filteredCoupons.length > 0 ? (

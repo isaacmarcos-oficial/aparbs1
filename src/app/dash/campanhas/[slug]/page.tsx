@@ -1,20 +1,31 @@
+// "use client";
+import { PrismaClient } from "@prisma/client";
 import { CouponClient } from "./_components/couponClient";
 
-export default function Page() {
+const prisma = new PrismaClient()
+
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+
+  const campaign = await prisma.campaign.findUnique({
+    where: { id: slug },
+    include: { coupons: true,}
+  })
+
+  if (!campaign) {
+    return <div>Campanha não encontrada.</div>;
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex  w-full items-center justify-center">
-              <h1 className="text-3xl font-bold text-center text-[#d90000]">
-                NOME DA CAMPANHA
-              </h1>
-            </div>
-          </div>
-          <CouponClient />
+    <div className="">
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex  w-full items-center justify-center">
+          <h1 className="text-3xl font-bold text-center uppercase text-[#d90000]">
+            {campaign.name}
+          </h1>
         </div>
       </div>
+      <CouponClient key={campaign.id} campaignId={campaign.id} coupons={campaign.coupons} />
     </div>
   );
 }

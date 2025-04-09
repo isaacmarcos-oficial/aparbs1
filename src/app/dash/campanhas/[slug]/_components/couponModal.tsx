@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { CouponType } from '@/types/campaignTypes';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import moment from 'moment-timezone';
 
 interface CouponModalProps {
   coupons: CouponType[];
@@ -30,38 +31,49 @@ export function CouponModal({ coupons, isOpen, onClose }: CouponModalProps) {
         </div>
         <div className="p-4 max-h-[70vh] overflow-y-auto">
           <div className="space-y-4">
-            <div className="bg-blue-50 p-4 rounded-md text-sm">
+            <div className="flex flex-col bg-blue-50 p-4 rounded-md text-sm font-medium gap-1">
               <p className="">
-                <strong>Cliente:</strong> <span className="font-medium">{coupons[0]?.clientName}</span>
+                <strong>Cliente: </strong>{coupons[0]?.clientCode} | {coupons[0]?.clientName}
               </p>
               <p className="">
-                <strong>OS/VB:</strong> <span className="font-medium">{coupons[0]?.orderNumber}</span>
+                <strong>CPF: </strong> {coupons[0]?.cpf}
               </p>
               <p className="">
-                <strong>Total de Cupons:</strong> <span className="font-medium">{coupons.length}</span>
+                <strong>OS/VB: </strong> {coupons[0]?.orderNumber}
+              </p>
+              <p className="">
+                <strong>Data: </strong> {moment(coupons[0]?.registrationDate).tz("America/Sao_Paulo").format('DD/MM/YYYY HH:mm')}
+              </p>
+              <p className="">
+                <strong>Total de Cupons:</strong> <span className="font-medium">
+                  {coupons.reduce((total, coupon) => total + coupon.couponNumber.length, 0)}
+                </span>
               </p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {coupons.map((coupon) => (
-                <Card
-                  key={coupon.id}
-                  className={`p-3 text-center ${coupon.isWinner
+              {coupons.map((coupon) =>
+                coupon.couponNumber.map((number) => (
+                  <Card
+                    key={`${coupon.id}-${number}`}
+                    className={`p-3 text-center ${coupon.isWinner
                       ? 'bg-yellow-100 border-2 border-yellow-400'
                       : 'bg-gray-50 border border-gray-200'
-                    }`}
-                >
-                  <span className="text-lg font-bold block">
-                    {coupon.couponNumber}
-                  </span>
-                  {coupon.isWinner && (
-                    <span className="text-xs font-medium text-yellow-800">
-                      Ganhador
+                      }`}
+                  >
+                    <span className="text-lg font-bold block">
+                      {number}
                     </span>
-                  )}
-                </Card>
-              ))}
+                    {coupon.isWinner && (
+                      <span className="text-xs font-medium text-yellow-800">
+                        Ganhador
+                      </span>
+                    )}
+                  </Card>
+                ))
+              )}
             </div>
+
           </div>
         </div>
         <div className="p-4 border-t">

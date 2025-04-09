@@ -1,14 +1,51 @@
+// schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model partners {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
+model Coupon {
+  id               String   @id @default(uuid())
+  clientCode       String
+  clientName       String
+  orderNumber      String
+  purchaseValue    Float
+  cpf              String
+  hasInstagramPost Boolean
+  registrationDate DateTime
+  isWinner         Boolean  @default(false)
+  isActive         Boolean  @default(true)
+  couponNumber     Int[]
+
+  // Relação opcional com campanha
+  campaignId String?
+  campaign   Campaign? @relation(fields: [campaignId], references: [id])
+
+  @@index([orderNumber, clientCode])
+}
+
+model Campaign {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relação com cupons
+  coupons Coupon[]
+
+  @@index([name])
+}
+
+model Partners {
+  id   String @id @default(uuid())
   name String
   url  String
 }
