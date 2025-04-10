@@ -5,8 +5,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { ArrowUpDown, Eye, MoreHorizontal, Target } from "lucide-react"
 import Link from "next/link"
 import { Campaign } from "@/types/campaignTypes"
+import moment from "moment"
 
 export const columns: ColumnDef<Campaign>[] = [
+  // SELECT
   {
     id: "select",
     header: ({ table }) => (
@@ -26,11 +28,23 @@ export const columns: ColumnDef<Campaign>[] = [
     enableSorting: false,
     enableHiding: false,
   },
+  // STATUS DA CAMPANHA
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string;
+      const start = new Date(row.original.startDate);
+      const end = new Date(row.original.endDate);
+      const now = new Date();
+
+      if (now < start) {
+        status = "programmed";
+      } else if (now >= start && now <= end) {
+        status = "ongoing";
+      } else {
+        status = "finished";
+      }
+
       const statusColors: Record<string, string> = {
         "finished": "text-red-500",
         "ongoing": "text-yellow-500",
@@ -40,6 +54,7 @@ export const columns: ColumnDef<Campaign>[] = [
       return <Target className={statusColors[status] || "text-gray-500"} />;
     },
   },
+  // NOME DA CAMPANHA
   {
     accessorKey: "name",
     header: ({ column }) => (
@@ -50,6 +65,29 @@ export const columns: ColumnDef<Campaign>[] = [
     ),
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
+  // INICIO DA CAMPANHA
+  {
+    accessorKey: "startDate",
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Início
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => <div className="capitalize">{moment(row.getValue("startDate")).format("DD/MM/YY")}</div>,
+  },
+  // FIM DA CAMPANHA
+  {
+    accessorKey: "endDate",
+    header: ({ column }) => (
+      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        Fim
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => <div className="capitalize">{moment(row.getValue("endDate")).format("DD/MM/YY")}</div>,
+  },
+  // AÇÃO
   {
     id: "actions",
     enableHiding: false,
@@ -72,7 +110,6 @@ export const columns: ColumnDef<Campaign>[] = [
                 Visualizar Campanha
               </DropdownMenuItem>
             </Link>
-            <DropdownMenuItem>Detalhes da campanha</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu >
       );

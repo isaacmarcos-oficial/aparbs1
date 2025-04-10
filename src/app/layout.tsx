@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "sonner";
+import { SessionProvider } from "./providers/sessionProvider";
 
 export const metadata: Metadata = {
   title: "APARBS Soluções Automotivas",
@@ -17,7 +19,10 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" />
       </head>
       <body className="">
-        {children}
+        <SessionProvider>
+          <Toaster />
+          {children}
+        </SessionProvider>
       </body>
     </html>
   );

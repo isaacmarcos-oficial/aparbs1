@@ -2,9 +2,8 @@
 
 import * as React from "react"
 import {
-  HelpCircleIcon,
-  SearchIcon,
-  SettingsIcon,
+  Home,
+  SquareArrowUpRight,
   Target,
   Users
 } from "lucide-react"
@@ -22,6 +21,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Image from "next/image"
+import { useSession } from "next-auth/react"
 
 const data = {
   user: {
@@ -30,6 +30,11 @@ const data = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
+    {
+      title: "Inicio",
+      url: "/dash",
+      icon: Home,
+    },
     {
       title: "Campanhas",
       url: "/dash/campanhas",
@@ -43,24 +48,23 @@ const data = {
   ],
   navSecondary: [
     {
-      title: "Settings",
-      url: "#",
-      icon: SettingsIcon,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: HelpCircleIcon,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: SearchIcon,
+      title: "Ir para o site",
+      url: "/",
+      icon: SquareArrowUpRight,
     },
   ],
 }
 
+
 export function DashSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: session } = useSession()
+
+  const user = {
+    name: session?.user?.name ?? "Usuário",
+    email: session?.user?.email ?? "",
+    avatar: session?.user?.image ?? "/default-avatar.png",
+  }
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -88,7 +92,7 @@ export function DashSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   )
