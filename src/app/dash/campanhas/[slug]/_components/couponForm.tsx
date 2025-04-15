@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Ticket, Upload, AlertCircle } from 'lucide-react';
+import { Ticket, Upload, AlertCircle, LoaderIcon, Loader2 } from 'lucide-react';
 import { CouponFormDataType } from '@/types/campaignTypes';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,8 @@ interface CouponFormProps {
 }
 
 export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
+  const [importLoading, setImportLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<CouponFormDataType>({
     campaignId: campaignId,
     clientCode: '',
@@ -22,12 +24,14 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
     orderNumber: '',
     purchaseValue: 0,
     hasInstagramPost: false,
+    saleDate: new Date()
   });
   const [importError, setImportError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setLoading(true);
     e.preventDefault();
 
     try {
@@ -53,13 +57,16 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
         clientName: '',
         orderNumber: '',
         purchaseValue: 0,
-        hasInstagramPost: false
+        hasInstagramPost: false,
+        saleDate: new Date()
       });
 
+      setLoading(false);
       // Se houver callback para atualizar uma lista em um componente pai
       if (onSubmit) {
         onSubmit(createdCoupon);
       }
+
     } catch (error: unknown) {
       console.error(error);
       setSuccessMessage('');
@@ -68,12 +75,14 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
   };
 
   const handleFileImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImportLoading(true);
     const file = e.target.files?.[0];
     if (!file) return;
 
     try {
       setImportError(null);
       const data = await importFromFile(file, campaignId);
+      console.log(data)
 
       for (const record of data) {
         const fullData = {
@@ -101,6 +110,8 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
       }
     } catch (error) {
       setImportError(error instanceof Error ? error.message : 'Erro ao importar arquivo');
+    } finally {
+      setImportLoading(false);
     }
   };
 
@@ -153,9 +164,17 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
               size="sm"
               onClick={() => fileInputRef.current?.click()}
               className=""
+              disabled={importLoading}
             >
-              <Upload className="h-4 w-4" />
-              Importar
+              {importLoading ? (
+                <Loader2 className="animate-spin h-4 w-4" />
+              ) : (
+                <>
+                  <Upload className="h-4 w-4" />
+                  Importar
+                </>
+              )
+              }
             </Button>
           </div>
 
@@ -230,6 +249,23 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
               />
             </div>
 
+            <div className="md:col-span-1">
+              <Label>Data da Venda</Label>
+              <Input
+                type="date"
+                required
+                className="w-full p-2 border rounded-md"
+                value={
+                  formData.saleDate
+                    ? formData.saleDate.toISOString().split('T')[0]
+                    : ''
+                }
+                onChange={(e) =>
+                  setFormData({ ...formData, saleDate: new Date(e.target.value) })
+                }
+              />
+            </div>
+
             <div className="md:col-span-1 flex items-end">
               <Label className="flex items-center space-x-2 cursor-pointer">
                 <Input
@@ -244,11 +280,18 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
           </div>
 
           <Button
+            disabled={loading}
             type="submit"
             className="mt-6 w-full"
           >
-            <Ticket size={20} />
-            Registrar
+            {loading ? (
+              <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <>
+                <Ticket size={20} />
+                Registrar
+              </>
+            )}
           </Button>
         </form>
       </Card>

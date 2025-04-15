@@ -9,7 +9,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   const campaign = await prisma.campaign.findUnique({
     where: { id: slug },
-    include: { coupons: true,}
+    include: { coupons: true, }
   })
 
   if (!campaign) {
@@ -24,6 +24,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             {campaign.name}
           </h1>
         </div>
+
       </div>
       <CouponClient key={campaign.id} campaignId={campaign.id} coupons={campaign.coupons} />
     </div>

@@ -42,7 +42,10 @@ export function CouponModal({ coupons, isOpen, onClose }: CouponModalProps) {
                 <strong>OS/VB: </strong> {coupons[0]?.orderNumber}
               </p>
               <p className="">
-                <strong>Data: </strong> {moment(coupons[0]?.registrationDate).tz("America/Sao_Paulo").format('DD/MM/YYYY HH:mm')}
+                <strong>Data do Registro: </strong> {moment(coupons[0]?.registrationDate).tz("America/Sao_Paulo").format('DD/MM/YYYY HH:mm')}
+              </p>
+              <p className="">
+                <strong>Data da Venda: </strong> {moment(coupons[0]?.saleDate).tz("Africa/Sao_Tome").format('DD/MM/YYYY HH:mm')}
               </p>
               <p className="">
                 <strong>Total de Cupons:</strong> <span className="font-medium">

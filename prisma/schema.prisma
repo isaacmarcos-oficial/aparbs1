@@ -20,6 +20,7 @@ model Coupon {
   isWinner         Boolean  @default(false)
   isActive         Boolean  @default(true)
   couponNumber     Int[]
+  saleDate         DateTime
 
   // Relação opcional com campanha
   campaignId String?
@@ -38,7 +39,6 @@ model Campaign {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relação com cupons
   coupons Coupon[]
 
   @@index([name])

@@ -17,6 +17,29 @@ type Coupon = {
   campaignId: string
 }
 
+// Função para formatar CPF no padrão "000.000.000-00"
+function formatCPF(value: string): string {
+  // Remove tudo o que não for dígito
+  const digits = value.replace(/\D/g, '')
+  // Limita a 11 dígitos, que é o tamanho do CPF
+  const limited = digits.substring(0, 11)
+
+  let formatted = ''
+  if (limited.length > 0) {
+    formatted = limited.substring(0, 3)
+  }
+  if (limited.length >= 4) {
+    formatted += '.' + limited.substring(3, 6)
+  }
+  if (limited.length >= 7) {
+    formatted += '.' + limited.substring(6, 9)
+  }
+  if (limited.length >= 10) {
+    formatted += '-' + limited.substring(9, 11)
+  }
+  return formatted
+}
+
 export default function Page() {
   const [cpf, setCpf] = useState('')
   const [hasSearched, setHasSearched] = useState(false);
@@ -31,7 +54,7 @@ export default function Page() {
     setHasSearched(true);
 
     try {
-      const response = await fetch(`/api/coupons?cpf=${cpf}`)
+      const response = await fetch(`/api/coupons?cpf=${encodeURIComponent(cpf)}`)
       if (!response.ok) throw new Error('Erro ao buscar cupons')
       const data = await response.json()
       setCoupons(data)
@@ -40,6 +63,11 @@ export default function Page() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleCpfChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value
+    setCpf(formatCPF(input))
   }
 
   return (
@@ -54,7 +82,7 @@ export default function Page() {
           <Input
             placeholder="Digite seu CPF"
             value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
+            onChange={handleCpfChange}
             className="flex-1"
           />
           <Button onClick={handleSearch} disabled={loading || cpf.length < 11}>

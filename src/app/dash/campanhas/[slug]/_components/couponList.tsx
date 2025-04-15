@@ -89,9 +89,8 @@ export function CouponList({
                 Cupons
               </th>
               <th className="p-3 px-6">
-                Registro
+                Data da venda
               </th>
-
               <th className="p-3 px-6">
                 Ações
               </th>
@@ -144,7 +143,7 @@ export function CouponList({
                     </Button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {order.registrationDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                    {order.saleDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex">

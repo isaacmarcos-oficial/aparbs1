@@ -9,6 +9,7 @@ export function exportToCSV(coupons: CouponType[], filename: string) {
     'Valor da Compra',
     'Post no Instagram',
     'Data de Registro',
+    'Data da Venda',
     'Nº(s) do Cupom',
     'Quantidade de Cupons',
     'Status',
@@ -23,6 +24,7 @@ export function exportToCSV(coupons: CouponType[], filename: string) {
     coupon.purchaseValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
     coupon.hasInstagramPost ? 'Sim' : 'Não',
     new Date(coupon.registrationDate).toLocaleDateString('pt-BR'),
+    new Date(coupon.saleDate).toLocaleDateString('pt-BR'),
     coupon.couponNumber.join(' / '), // Agora é array
     coupon.couponNumber.length,       // Quantidade de cupons
     coupon.isActive ? 'Ativo' : 'Inativo',

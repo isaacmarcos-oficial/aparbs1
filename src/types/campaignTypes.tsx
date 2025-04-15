@@ -7,6 +7,7 @@ export interface CouponType {
   purchaseValue: number;
   hasInstagramPost: boolean;
   registrationDate: Date;
+  saleDate: Date;
   isWinner: boolean;
   isActive: boolean;
   couponNumber: number[];
@@ -20,6 +21,7 @@ export interface CouponFormDataType {
   orderNumber: string;
   purchaseValue: number;
   hasInstagramPost: boolean;
+  saleDate: Date;
 }
 
 export interface SearchFiltersType {

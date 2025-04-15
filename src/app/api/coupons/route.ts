@@ -1,18 +1,29 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-function generateUniqueNumbers(count: number): number[] {
+async function generateUniqueNumbers(count: number): Promise<number[]> {
   const result: number[] = [];
+  
+  // Consulta todos os números de cupons já gerados no banco
+  const coupons = await prisma.coupon.findMany({
+    select: { couponNumber: true }
+  });
+  
+  // Cria um conjunto (Set) com os números já utilizados
   const used = new Set<number>();
-
-  while (result.length < count) {
-    const number = Math.floor(Math.random() * 90000) + 10000;
-    if (!used.has(number)) {
-      result.push(number);
-      used.add(number);
-    }
+  for (const coupon of coupons) {
+    coupon.couponNumber.forEach(num => used.add(num));
   }
 
+  // Gera números únicos evitando os já utilizados
+  while (result.length < count) {
+    const candidate = Math.floor(Math.random() * 90000) + 10000;
+    if (!used.has(candidate)) {
+      result.push(candidate);
+      used.add(candidate);
+    }
+  }
+  
   return result;
 }
 
@@ -37,13 +48,14 @@ export async function POST(request: Request) {
       !data.orderNumber ||
       !data.purchaseValue ||
       data.hasInstagramPost === undefined ||
-      !data.cpf
+      !data.cpf ||
+      !data.saleDate
     ) {
       throw new Error("Dados obrigatórios não informados.");
     }
 
     const quantity = calculateCouponCount(data.purchaseValue, data.hasInstagramPost);
-    const couponNumber = generateUniqueNumbers(quantity);
+    const couponNumber = await generateUniqueNumbers(quantity);
 
     const couponData = {
       clientCode: data.clientCode,
@@ -53,6 +65,7 @@ export async function POST(request: Request) {
       cpf: data.cpf,
       hasInstagramPost: data.hasInstagramPost,
       registrationDate: new Date(), // Define a data atual
+      saleDate : new Date(data.saleDate),
       couponNumber,
       campaignId: data.campaignId || null,
     };
