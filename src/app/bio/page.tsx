@@ -3,8 +3,9 @@ import Image from "next/image";
 import LinkBio from "./_components/linkBio";
 import { BriefcaseBusiness, MapPin } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
-import { BsTruckFlatbed } from "react-icons/bs";
 import Link from "next/link";
+import MercadoLivreLogo from "./_components/mercadoLivreLogo";
+import TowTruck from "./_components/towTruck";
 
 export default function Bio() {
   return (
@@ -38,22 +39,34 @@ export default function Bio() {
             title="Fale conosco"
             iconLink={<FaWhatsapp />}
             adress="https://api.whatsapp.com/send?phone=553832208767&text=Olá%2C estou no site da APARBS. Gostaria de receber atendimento"
+            target="_blank"
           />
+          <LinkBio
+            title="Loja Oficial - MERCADO LIVRE"
+            iconLink={<MercadoLivreLogo className="w-6 h-6 " />}
+            adress="https://www.mercadolivre.com.br/loja/aparbs"
+            target="_blank"
+          />
+
+          <LinkBio
+            title="APARBS Transportes"
+            iconLink={<TowTruck className="w-6 h-6" />}
+            adress="https://api.whatsapp.com/send?phone=5538999944889&text=Olá%2C estou no site da APARBS. Gostaria de receber atendimento"
+            target="_blank"
+          />
+
           <LinkBio
             title="Encontre-nos"
             iconLink={<MapPin />}
             adress="https://www.google.com/maps/dir//aparbs+porteirinha/@-15.755457,-43.0466363,14.17z/data=!4m8!4m7!1m0!1m5!1m1!1s0x752281b048ee24b:0x8ce9b567298b1724!2m2!1d-43.0311318!2d-15.7536274?hl=pt-br"
-          />
-          <LinkBio
-            title="APARBS Transportes"
-            iconLink={<BsTruckFlatbed />}
-            adress="https://api.whatsapp.com/send?phone=5538999944889&text=Olá%2C estou no site da APARBS. Gostaria de receber atendimento"
+            target="_blank"
           />
 
           <LinkBio
             title="Trabalhe conosco"
             iconLink={<BriefcaseBusiness />}
             adress="/trabalhe-conosco"
+            target="_blank"
           />
         </div>
 

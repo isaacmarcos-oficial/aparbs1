@@ -7,9 +7,10 @@ interface LinkBioProps {
   title: string;
   iconLink: React.ReactNode;
   adress: string;
+  target?: string
 }
 
-export default function LinkBio({ title, iconLink, adress }: LinkBioProps) {
+export default function LinkBio({ title, iconLink, adress, target }: LinkBioProps) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -17,6 +18,7 @@ export default function LinkBio({ title, iconLink, adress }: LinkBioProps) {
       href={adress}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      target={target}
     >
       <Card className={`flex items-center h-14 p-4 rounded ${isHovered ? "text-pimary" : "text-[#d90000]"} font-bold transition-all`}>
         <span className="mr-4 text-3xl">
