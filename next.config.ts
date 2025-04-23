@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/trabalhe-conosco',
-        destination: 'https://forms.gle/3b4RPCroYB7rTgvPA',
+        destination: 'https://forms.gle/QqqE5LxmSQiGxhKV7',
         permanent: false,
       }
     ];
