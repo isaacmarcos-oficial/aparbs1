@@ -9,15 +9,15 @@ const nextConfig: NextConfig = {
       { hostname: "picsum.photos" },
     ]
   },
-  async redirects() {
-    return [
-      {
-        source: '/trabalhe-conosco',
-        destination: 'https://forms.gle/QqqE5LxmSQiGxhKV7',
-        permanent: false,
-      }
-    ];
-  },
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: '/trabalhe-conosco',
+  //       destination: 'https://forms.gle/QqqE5LxmSQiGxhKV7',
+  //       permanent: false,
+  //     }
+  //   ];
+  // },
 };
 
 export default nextConfig;
