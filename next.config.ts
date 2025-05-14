@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
       { hostname: "res.cloudinary.com" },
       { hostname: "www.aparbs.com.br" },
       { hostname: "www.datocms-assets.com" },
+      { hostname: "picsum.photos" },
     ]
   },
   async redirects() {

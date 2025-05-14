@@ -5,7 +5,7 @@ import { ArrowUpDown } from "lucide-react"
 import { EditUserModal } from "./EditUserModal"
 import { User } from "@prisma/client"
 
-export const columns: ColumnDef<User>[] = [
+export const usersColumns: ColumnDef<User>[] = [
   {
     id: "select",
     header: ({ table }) => (

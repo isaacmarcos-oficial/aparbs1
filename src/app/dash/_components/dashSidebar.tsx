@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import {
+  Car,
   Home,
   SquareArrowUpRight,
   Target,
@@ -44,6 +45,11 @@ const data = {
       title: "Usuários",
       url: "/dash/usuarios",
       icon: Users
+    },
+    {
+      title: "Locação",
+      url: "/dash/locacao",
+      icon: Car
     }
   ],
   navSecondary: [

@@ -7,7 +7,7 @@ import Link from "next/link"
 import { Campaign } from "@/types/campaignTypes"
 import moment from "moment"
 
-export const columns: ColumnDef<Campaign>[] = [
+export const campaignColumns: ColumnDef<Campaign>[] = [
   // SELECT
   {
     id: "select",
