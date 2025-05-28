@@ -7,9 +7,9 @@ export function Footer() {
 
   return (
     <div className="flex w-full flex-col mt-12 pt-12 items-center bg-zinc-950 text-primary-foreground font-light text-xs">
-      <div className="grid justify-center grid-cols-1 md:grid-cols-4 max-w-screen-xl w-full mb-10 px-8 md:px-4 lg:px-0 gap-8 md:gap-0">
+      <div className="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-3 max-w-screen-xl w-full mb-10 px-8 md:px-4 lg:px-0 gap-8 md:gap-0">
         {/* Serviços */}
-        <div className="flex flex-col leading-7">
+        <div className="flex flex-col w-full leading-7 col-span-2 md:col-span-1 text-center md:text-start">
           <h3 className="text-xl mb-1 text-[#d90000] font-bold">
             Nossos Serviços
           </h3>
@@ -19,14 +19,16 @@ export function Footer() {
           <p>Auto Socorro</p>
           <p>Ar Condicionado</p>
           <p>Injeção Eletrônica</p>
+          <p>Rastreamento e Diagnóstico</p>
           <p>Limpeza de Bico</p>
           <p>Peças e Baterias</p>
+          <p>Locação de Veículos</p>
         </div>
 
         {/* APARBS Porteirinha */}
-        <div className="flex flex-col leading-7">
+        <div className="flex flex-col w-full leading-7 col-span-2 md:col-span-1 text-center md:text-start">
           <h3 className="text-xl mb-1 text-[#d90000] font-bold">
-            Porteirinha/MG
+            APARBS Soluções <br/> Automotivas
           </h3>
           <p className="text-zinc-500 font-light">
             07.263.234/0001-70
@@ -43,10 +45,13 @@ export function Footer() {
         </div>
 
         {/* APARBS Transportes */}
-        <div className="flex flex-col leading-7">
+        <div className="flex flex-col leading-7 col-span-2 md:col-span-1 text-center md:text-start">
           <h3 className="text-xl mb-1 text-[#d90000] font-bold">
             APARBS Transportes
           </h3>
+          <div className="">
+            
+          </div>
           <p className="text-zinc-500 font-light">
             51.494.204/0001-67
           </p>
@@ -61,18 +66,15 @@ export function Footer() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-4 items-center col-span-2 lg:col-span-1">
-          <h3 className="text-xl mb-1 text-[#d90000] font-bold">
-            APARBS Soluções Automotivas
-          </h3>
+        <div className="flex flex-col gap-4 items-center col-span-3 lg:col-span-1">
 
           <Image
             width={150}
             height={80}
-            src="/Aparbs Dark 3.svg" alt="APARBS Soluções Automotivas" />
+            src="/Aparbs Dark 10.svg" alt="APARBS Soluções Automotivas" />
 
-          <p className="font-Hind">
-            Há mais de 25 anos no mercado atendendo com qualidade,
+          <p className="font-Hind text-center">
+            Há mais de 25 anos no mercado atendendo com qualidade,<br/>
             garantindo eficiência em serviços automotivos.
           </p>
 
@@ -83,7 +85,7 @@ export function Footer() {
       </div>
 
       <div className="flex py-4 leading-10 w-full border-[1.0px] items-center justify-center border-zinc-600">
-        <div className="flex w-full max-w-screen-xl text-sm items justify-between px-9 md:px-4 lg:px-0 flex-col md:flex-row">
+        <div className="flex w-full max-w-screen-xl text-sm items justify-between gap-2 items-center px-9 md:px-4 lg:px-0 flex-col md:flex-row">
           <p>
             Copyright © {currentYear}
             <Link

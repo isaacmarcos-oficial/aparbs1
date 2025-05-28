@@ -78,3 +78,21 @@ export const salaEspera = [
   "Televisão e entretenimento",
   "Informações sobre o andamento do serviço"
 ]
+
+export const locacaoVeiculo = [
+  "Aluguel de veículos para uso temporário",
+  "Veículos revisados e prontos para uso imediato",
+  "Planos flexíveis para curtos ou longos períodos",
+  "Assistência 24h durante o período de locação",
+  "Seguro incluso em todos os veículos",
+  "Entrega e retirada do veículo sob demanda"
+]
+
+export const scannerAutomotivo = [
+  "Leitura de falhas através do conector OBD-II",
+  "Diagnóstico computadorizado de todos os módulos",
+  "Visualização de parâmetros em tempo real (RPM, temperatura, sensores, etc.)",
+  "Reset de luzes de aviso (injeção, ABS, airbag, etc.)",
+  "Análise de códigos de falha e sugestões de reparo",
+  "Geração de relatório técnico detalhado"
+]

@@ -10,7 +10,7 @@ export default function About() {
           </h1>
 
           <p className="text-center text-lg tracking-wide w-full md:w-1/2">
-            Há mais de 25 anos no mercado atendendo com qualidade, <br/> garantindo
+            Há mais de 25 anos no mercado atendendo com qualidade, <br /> garantindo
             eficiência em serviços automotivos.
           </p>
         </div>
@@ -20,7 +20,7 @@ export default function About() {
             <Image
               width={400}
               height={500}
-              src="/Fachada1.webp"
+              src="/Fachada1.png"
               alt="Fachada da oficina mecânica APARBS na cidade de Porteirinha MG e na cidade de Riacho dos Machados"
               loading="lazy"
             />
@@ -31,18 +31,11 @@ export default function About() {
               Conheça Nossa História
             </h2>
             <p className="lg:text-lg font-light leading-7 text-zinc-600">
-              A Aparbs é referência no ramo de soluções automotivas. Assim como os
-              carros precisam das engrenagens para funcionar, a Aparbs também
-              trabalha assim, cada irmão é uma engrenagem que faz tudo rodar e
-              correr da melhor forma para atender às demandas dos clientes.
+              A APARBS nasceu da paixão de <span className="font-bold text-[#d90000]">José Aelton</span> por carros e da vontade de fazer diferente. O que começou com uma pequena oficina à beira da estrada chamada Oficina Raio Sol, focada em alternadores e motores de arranque. Com muito trabalho, ele conquistou espaço e respeito, até chegar ao endereço atual.
               <br /> <br />
-              Na sua simbologia, pode-se observar o círculo, que é sinônimo de
-              movimento.
+              Hoje, com mais de 25 anos de história, somos referência em soluções automotivas completas, mantendo o compromisso com qualidade, confiança.
               <br /> <br />
-              Ele simboliza também a eternidade, as engrenagens que mantém tudo
-              funcionando em ordem. Além disso, o elo dá referência à família por
-              trás do negócio, que trabalha junta para a melhoria contínua da
-              Aparbs!
+              Desde os primeiros atendimentos até hoje, nossa missão sempre foi clara: entregar um serviço confiável, seguro e acolhedor — daqueles que dão orgulho de indicar. Aqui, cada carro é tratado com o mesmo cuidado que damos aos nossos próprios veículos, e cada cliente é recebido como parte da nossa história.
             </p>
           </div>
         </div>
