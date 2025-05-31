@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Coupon {
-  id               String   @id @default(uuid())
+  id               String   @id @default(uuid()) @db.Uuid
   clientCode       String
   clientName       String
   orderNumber      String
@@ -30,7 +30,7 @@ model Coupon {
 }
 
 model Campaign {
-  id          String   @id @default(uuid())
+  id          String   @id @default(uuid()) @db.Uuid
   name        String
   description String?
   startDate   DateTime

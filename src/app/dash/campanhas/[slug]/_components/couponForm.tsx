@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { downloadCouponTemplate } from '@/utils/downloadTemplate';
 import { importFromFile } from '@/utils/importFromFile';
+import { redirect } from 'next/navigation';
 
 interface CouponFormProps {
   onSubmit?: (formData: CouponFormDataType) => void; // <-- aqui
@@ -29,6 +30,10 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
   const [importError, setImportError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const redirectToSorteio = () => {
+    redirect(`/dash/campanhas/${campaignId}/sorteio`)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     setLoading(true);
@@ -147,6 +152,12 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">Novo Registro</h2>
           <div className="flex relative gap-2 items-center">
+            <Button
+              size="sm"
+              onClick={redirectToSorteio}
+            >
+              Ir para sorteio
+            </Button>
             <Button
               size="sm"
               onClick={downloadCouponTemplate}
