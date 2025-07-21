@@ -19,10 +19,10 @@ import { Button } from "@/components/ui/button";
 
 export default function Offices() {
   return (
-    <div className="flex w-full items-center justify-center py-8">
+    <section id="nossos-servicos" aria-labelledby="servicos-title" className="flex w-full items-center justify-center py-8">
       <div className="max-w-screen-xl">
         <div className="w-full  px-4 lg:px-0 flex-col items-center justify-center">
-          <h2 className="text-[#d90000] mb-8 text-center text-3xl font-black">
+          <h2 id="servicos-title" className="text-[#d90000] mb-8 text-center text-3xl font-black">
             <a href="#NossosServicos">Nossos Serviços</a>
           </h2>
         </div>
@@ -118,6 +118,6 @@ export default function Offices() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

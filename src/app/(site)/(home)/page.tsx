@@ -4,6 +4,7 @@ import Destaque from "./_components/destaque";
 import Hero from "./_components/hero";
 import Offices from "./_components/offices/offices";
 import Partners from "./_components/partners";
+import Rent from "./_components/rent";
 
 export default function Homepage() {
   return (
@@ -11,7 +12,8 @@ export default function Homepage() {
       <Hero />
       <Destaque />
       <About />
-      <Offices/>
+      <Rent />
+      <Offices />
       <Contact />
       <Partners />
     </div>
