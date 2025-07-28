@@ -3,12 +3,8 @@ import Link from "next/link";
 
 const Vagas = [
   {
-    title: "Vendedor de Peças",
-    link: "https://forms.gle/dnCG4yfxzRfEjsnH9",
-  },
-  {
-    title: "Atendente de Balcão",
-    link: "https://forms.gle/9Qjb3WKrXQ2WvA94A",
+    title: "Mecânico Automotivo",
+    link: "https://forms.gle/iq6M1dmhHXJcWBQHA",
   },
 ];
 
