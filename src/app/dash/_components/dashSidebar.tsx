@@ -47,8 +47,8 @@ const data = {
       icon: Users
     },
     {
-      title: "Locação",
-      url: "/dash/locacao",
+      title: "Transportes",
+      url: "/dash/transportes",
       icon: Car
     }
   ],

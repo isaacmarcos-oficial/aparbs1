@@ -1,10 +1,8 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
 import { NextAuthOptions, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
-
-const prisma = new PrismaClient();
+import { createClient } from "@/utils/supabase/server";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -15,18 +13,34 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Senha", type: "password" },
       },
       async authorize(credentials) {
-        // Busque o usuário pelo e-mail
-        const user = await prisma.user.findUnique({
-          where: { email: credentials?.email },
-        });
+        const supabase = await createClient();
+
+        const { data: users, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("email", credentials?.email)
+          .limit(1);
+
+        const user = users?.[0];
+
+        console.log("Trying to log in with:", credentials?.email);
+        console.log(user, error);
+
         if (user && credentials?.password) {
           const isValid = await compare(credentials.password, user.password);
           if (isValid) {
-            return { id: user.id, email: user.email, name: user.name, role: user.role };
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              role: user.role,
+            };
           }
         }
+
         return null;
       },
+
     }),
   ],
   pages: {

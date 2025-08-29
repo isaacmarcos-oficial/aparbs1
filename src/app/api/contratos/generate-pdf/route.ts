@@ -5,10 +5,13 @@ import { ContratoPDF } from "@/components/ContratoPDF"
 export async function POST(req: NextRequest) {
   const body = await req.json()
 
-  const pdfDoc = ContratoPDF(body) // <-- aqui é uma função normal, sem JSX direto
+  const pdfDoc = ContratoPDF(body)
   const pdfBuffer = await renderToBuffer(pdfDoc)
 
-  return new Response(pdfBuffer, {
+  // Converte o Buffer para Uint8Array
+  const pdfArray = new Uint8Array(pdfBuffer)
+
+  return new Response(pdfArray, {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",

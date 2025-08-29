@@ -1,15 +1,15 @@
-// schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Coupon {
-  id               String   @id @default(uuid()) @db.Uuid
+  id               String    @id @default(uuid())
   clientCode       String
   clientName       String
   orderNumber      String
@@ -17,20 +17,18 @@ model Coupon {
   cpf              String
   hasInstagramPost Boolean
   registrationDate DateTime
-  isWinner         Boolean  @default(false)
-  isActive         Boolean  @default(true)
+  isWinner         Boolean   @default(false)
+  isActive         Boolean   @default(true)
   couponNumber     Int[]
   saleDate         DateTime
-
-  // Relação opcional com campanha
-  campaignId String?
-  campaign   Campaign? @relation(fields: [campaignId], references: [id])
+  campaignId       String?
+  campaign         Campaign? @relation(fields: [campaignId], references: [id])
 
   @@index([orderNumber, clientCode])
 }
 
 model Campaign {
-  id          String   @id @default(uuid()) @db.Uuid
+  id          String   @id @default(uuid())
   name        String
   description String?
   startDate   DateTime
@@ -38,8 +36,7 @@ model Campaign {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  coupons Coupon[]
+  coupons     Coupon[]
 
   @@index([name])
 }
@@ -57,4 +54,38 @@ model User {
   password  String
   createdAt DateTime @default(now())
   role      String
+}
+
+model Prize {
+  id          String   @id
+  name        String
+  drawnNumber Int
+  drawnAt     DateTime @default(now())
+  couponId    String   @db.Uuid
+  campaignId  String   @db.Uuid
+
+  @@index([campaignId])
+}
+
+model TransportsRevenue {
+  id            String   @id @default(uuid())
+  date          String?
+  osNumber      String?
+  client        String?
+  vehicle       String?
+  plate         String?
+  paymentMethod String
+  amount        Float
+  service       String?
+  createdAt     DateTime @default(now())
+}
+
+model TransportsExpense {
+  id            String   @id @default(uuid())
+  date String?
+  description String?
+  category String?
+  amount Float
+  service String?
+  createdAt     DateTime @default(now())
 }
