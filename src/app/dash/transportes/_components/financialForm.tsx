@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
-import { X, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { ServiceType, Revenue, Expense, VehicleType, PaymentMethod, Vehicles, } from '@/types/transportsType';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DialogTitle } from '@/components/ui/dialog';
 
 type FinancialFormData = {
   date: string;
@@ -108,65 +114,63 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
 
   const activeVehicles = vehicles.filter(v => v.active === true);
 
+  const categories = ['combustivel', 'manutencao', 'seguro', 'impostos', 'salarios', 'outros'];
+
+  const paymentMethods = ['dinheiro', 'cartao', 'cheque', 'transferencia', 'pix', 'boleto', 'carteira'];
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className=" bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-              <p className="text-sm text-gray-600">Serviço: {serviceName}</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X className="h-6 w-6" />
-            </button>
+    <div className="">
+      <form onSubmit={handleSubmit}>
+        <div className="">
+          <div className="flex items-center gap-2">
+            <DialogTitle className="text-lg font-semibold text-gray-900">{title}</DialogTitle>
+            <Badge className="text-xs bg-sky-500"> {serviceName}</Badge>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 grid grid-cols-2 gap-4 w-full">
+        <Separator className="" />
+
+        <div className="my-2 grid grid-cols-2 gap-4 w-full">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label>
               Data
-            </label>
-            <input
+            </Label>
+            <Input
               type="date"
               required
               value={formData.date}
               onChange={(e) => updateFormData('date', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className=""
             />
           </div>
 
           {isRevenue && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <Label>
                   Número O.S
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   required
                   value={formData.osNumber}
                   onChange={(e) => updateFormData('osNumber', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className=""
                   placeholder="Ex: 001"
                 />
               </div>
 
 
               <div className='col-span-2'>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <Label>
                   Cliente
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   required
                   value={formData.client}
                   onChange={(e) => updateFormData('client', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className=""
                   placeholder="Nome do cliente"
                 />
               </div>
@@ -175,14 +179,14 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label>
               Veículo
-            </label>
-            <select
+            </Label>
+            <Select
               required
               value={formData.vehicle}
-              onChange={(e) => {
-                const selectedValue = e.target.value;
+              onValueChange={(value) => {
+                const selectedValue = value;
                 updateFormData('vehicle', selectedValue);
 
                 if (service === 'locacao' || !isRevenue) {
@@ -194,31 +198,38 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
                   }
                 }
               }}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
             >
-              {activeVehicles.map((vehicle) => (
-                <option
-                  key={vehicle.id}
-                  value={`${vehicle.model} - ${vehicle.plate}`}
-                  className="uppercase"
-                >
-                  {vehicle.model} - {vehicle.plate}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className='uppercase'>
+                <SelectValue placeholder="Selecione um veículo" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Veículo</SelectLabel>
+                  {activeVehicles.map((vehicle) => (
+                    <SelectItem
+                      key={vehicle.id}
+                      value={`${vehicle.model} - ${vehicle.plate}`}
+                      className="uppercase"
+                    >
+                      {vehicle.model} - {vehicle.plate}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label>
               Placa
-            </label>
-            <input
+            </Label>
+            <Input
               type="text"
               required
               value={formData.plate}
               onChange={(e) => updateFormData('plate', e.target.value)}
               disabled={service === 'locacao' || !isRevenue}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className=""
               placeholder="Ex: ABC-1234"
             />
           </div>
@@ -226,34 +237,44 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
           {!isRevenue && (
             <>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <Label>
                   Categoria
-                </label>
-                <select
+                </Label>
+                <Select
                   required
                   value={formData.category}
-                  onChange={(e) => updateFormData('category', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  onValueChange={(value) => updateFormData('category', value)}
                 >
-                  <option value="combustivel">Combustível</option>
-                  <option value="manutencao">Manutenção</option>
-                  <option value="seguro">Seguro</option>
-                  <option value="impostos">Impostos</option>
-                  <option value="salarios">Salários</option>
-                  <option value="outros">Outros</option>
-                </select>
+                  <SelectTrigger className='uppercase'>
+                    <SelectValue placeholder="Selecione uma categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Categoria</SelectLabel>
+                      {categories.map((category) => (
+                        <SelectItem
+                          key={category}
+                          value={category}
+                          className="uppercase"
+                        >
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className='col-span-2'>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <Label>
                   Descrição
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   required
                   value={formData.description}
                   onChange={(e) => updateFormData('description', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className=""
                   placeholder="Descrição da despesa"
                 />
               </div>
@@ -261,62 +282,75 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label>
               Forma de Pagamento
-            </label>
-            <select
+            </Label>
+            <Select
               required
               value={formData.paymentMethod}
-              onChange={(e) => updateFormData('paymentMethod', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              onValueChange={(value) => updateFormData('paymentMethod', value)}
             >
-              <option value="dinheiro">Dinheiro</option>
-              <option value="cartao_credito">Cartão de Crédito</option>
-              <option value="cartao_debito">Cartão de Débito</option>
-              <option value="pix">PIX</option>
-              <option value="transferencia">Transferência</option>
-            </select>
+              <SelectTrigger className='uppercase'>
+                <SelectValue placeholder="Selecione uma forma de pagamento" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Forma de Pagamento</SelectLabel>
+                  {paymentMethods.map((method) => (
+                    <SelectItem
+                      key={method}
+                      value={method}
+                      className="uppercase"
+                    >
+                      {method}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <Label>
               Valor (R$)
-            </label>
-            <input
+            </Label>
+            <Input
               type="number"
               step="0.01"
               min="0"
               required
               value={formData.amount}
               onChange={(e) => updateFormData('amount', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className=""
               placeholder="0,00"
             />
           </div>
 
-          <div className="flex space-x-3 pt-4 col-span-2">
-            <Button
-              variant="outline"
-              type="button"
-              onClick={onClose}
-              className="flex-1"
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 text-white font-medium transition-colors ${isRevenue
-                ? 'bg-green-600 hover:bg-green-700'
-                : 'bg-red-600 hover:bg-red-700'
-                }`}
-            >
-              <Plus className="h-4 w-4" />
-              <span>Salvar {isRevenue ? 'Receita' : 'Despesa'}</span>
-            </Button>
-          </div>
-        </form>
-      </div>
+
+        </div>
+
+        <div className="flex">
+          <Button
+            variant="outline"
+            type="button"
+            onClick={onClose}
+            className="flex-1"
+          >
+            Cancelar
+          </Button>
+          <Button
+            type="submit"
+            disabled={loading}
+            className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 text-white font-medium transition-colors ${isRevenue
+              ? 'bg-green-600 hover:bg-green-700'
+              : 'bg-red-600 hover:bg-red-700'
+              }`}
+          >
+            <Plus className="h-4 w-4" />
+            <span>Salvar {isRevenue ? 'Receita' : 'Despesa'}</span>
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };

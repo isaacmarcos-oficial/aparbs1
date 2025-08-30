@@ -9,6 +9,7 @@ import { ServiceView } from "./_components/serviceView";
 import { VehicleView } from "./_components/vehicleView";
 import { PerformanceView } from "./_components/performanceView";
 import { toast } from "sonner";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 export default function Page() {
   const [activeService, setActiveService] = useState<ServiceType>('locacao');
@@ -105,7 +106,20 @@ export default function Page() {
         />
       )}
 
-      {showForm && (
+      <Dialog open={showForm} onOpenChange={(open) => !open && setShowForm(false)}>
+        <DialogContent>
+          <FinancialForm
+            type={formType}
+            service={activeService}
+            vehicles={vehicles}
+            onSubmitRevenue={handleAddRevenue}
+            onSubmitExpense={handleAddExpense}
+            onClose={() => setShowForm(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* {showForm && (
         <FinancialForm
           type={formType}
           service={activeService}
@@ -114,7 +128,7 @@ export default function Page() {
           onSubmitExpense={handleAddExpense}
           onClose={() => setShowForm(false)}
         />
-      )}
+      )} */}
     </div>
   )
 }
