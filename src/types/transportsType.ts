@@ -1,4 +1,4 @@
-export type ServiceType = 'locacao' | 'guincho' | 'performance';
+export type ServiceType = 'locacao' | 'guincho' | 'performance' | 'vehicles';
 
 export type PaymentMethod = 'dinheiro' | 'cartao_credito' | 'cartao_debito' | 'pix' | 'transferencia';
 
@@ -17,9 +17,17 @@ export interface Revenue {
   service: ServiceType;
 }
 
+export interface Vehicles {
+  id: string;
+  model: string;
+  plate: string;
+  active: boolean;
+}
+
 export interface Expense {
   id: string;
   date: string;
+  vehicle: string;
   description: string;
   category: string;
   amount: number;

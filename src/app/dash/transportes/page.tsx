@@ -1,15 +1,14 @@
 "use client"
 import LogTabs from "./_components/logTabs";
-import { FinancialSummary } from "./_components/financialSummary";
 import { useState } from "react";
 import { Expense, Revenue, ServiceType } from "@/types/transportsType";
-import { MonthlyChart } from "./_components/monthlyChart";
-import { Button } from "@/components/ui/button";
-import { RevenueTable } from "./_components/revenueTable";
-import { ExpenseTable } from "./_components/expenseTable";
 import { useFinancialData } from "@/hooks/useFinancialData";
 import { FinancialForm } from "./_components/financialForm";
 import { Loader } from "lucide-react";
+import { ServiceView } from "./_components/serviceView";
+import { VehicleView } from "./_components/vehicleView";
+import { PerformanceView } from "./_components/performanceView";
+import { toast } from "sonner";
 
 export default function Page() {
   const [activeService, setActiveService] = useState<ServiceType>('locacao');
@@ -19,19 +18,22 @@ export default function Page() {
   const {
     revenues,
     expenses,
+    vehicles,
     loading,
-    error,
     addRevenue,
     addExpense,
     deleteRevenue,
-    deleteExpense
+    deleteExpense,
+    toggleVehicleStatus
   } = useFinancialData();
 
   const handleAddRevenue = async (revenue: Omit<Revenue, 'id'>) => {
     try {
       await addRevenue(revenue);
+      toast.success('Receita cadastrada com sucesso!')
       setShowForm(false);
-    } catch (error) {
+    } catch (error: unknown) {
+      toast.error('Erro ao adicionar receita')
       console.error('Error adding revenue:', error);
     }
   };
@@ -39,8 +41,10 @@ export default function Page() {
   const handleAddExpense = async (expense: Omit<Expense, 'id'>) => {
     try {
       await addExpense(expense);
+      toast.success('Despesa cadastrada com sucesso!')
       setShowForm(false);
-    } catch (error) {
+    } catch (error: unknown) {
+      toast.error('Erro ao adicionar despesa')
       console.error('Error adding expense:', error);
     }
   };
@@ -55,21 +59,16 @@ export default function Page() {
     ? expenses
     : expenses.filter(expense => expense.service === activeService);
 
-  // const filteredRevenues = revenues.filter(revenue => revenue.service === activeService);
-  // const filteredExpenses = expenses.filter(expense => expense.service === activeService);
-
   const openForm = (type: 'receita' | 'despesa') => {
     setFormType(type);
     setShowForm(true);
   };
 
   if (loading) {
-    return <div><Loader className="w-6 h-6 animate-spin" /></div>;
+    return <div className="flex items-center justify-center w-full h-screen"><Loader className="w-6 h-6 animate-spin" /></div>;
   }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  const isServiceView = activeService === 'locacao' || activeService === 'guincho'
 
   return (
     <div className="flex w-full flex-col gap-6 max-w-7xl mx-auto">
@@ -78,64 +77,39 @@ export default function Page() {
         setActiveService={(service: string) => setActiveService(service as ServiceType)}
       />
 
-      <FinancialSummary
-        expenses={filteredExpenses}
-        revenues={filteredRevenues}
-        service={activeService}
-      />
-
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        <MonthlyChart
+      {isServiceView && (
+        <ServiceView
+          service={activeService}
           revenues={filteredRevenues}
           expenses={filteredExpenses}
-          service={activeService}
+          onAddRevenue={() => openForm('receita')}
+          onAddExpense={() => openForm('despesa')}
+          onDeleteRevenue={deleteRevenue}
+          onDeleteExpense={deleteExpense}
         />
+      )}
 
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Ações Rápidas
-          </h3>
-          <div className="space-y-3">
-            <Button
-              onClick={() => openForm('receita')}
-              className="w-full bg-green-600 px-4 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
-            >
-              Adicionar Receita
-            </Button>
-            <Button
-              onClick={() => openForm('despesa')}
-              variant={"destructive"}
-              className="w-full px-4 py-3 rounded-lg hover:bg-red-700 transition-colors font-medium"
-            >
-              Adicionar Despesa
-            </Button>
-          </div>
-        </div>
+      {activeService === 'vehicles' && (
+        <VehicleView
+          expenses={expenses}
+          revenues={revenues}
+          toggleVehicleStatus={toggleVehicleStatus}
+          vehicles={vehicles}
+        />
+      )}
 
-      </div>
-
-
-      {activeService !== 'performance' &&
-        <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-8">
-          <RevenueTable
-            revenues={filteredRevenues}
-            service={activeService}
-            onDelete={deleteRevenue}
-          />
-
-          <ExpenseTable
-            expenses={filteredExpenses}
-            service={activeService}
-            onDelete={deleteExpense}
-          />
-        </div>
-      }
-
+      {activeService === 'performance' && (
+        <PerformanceView
+          revenues={revenues}
+          expenses={expenses}
+        />
+      )}
 
       {showForm && (
         <FinancialForm
           type={formType}
           service={activeService}
+          vehicles={vehicles}
           onSubmitRevenue={handleAddRevenue}
           onSubmitExpense={handleAddExpense}
           onClose={() => setShowForm(false)}

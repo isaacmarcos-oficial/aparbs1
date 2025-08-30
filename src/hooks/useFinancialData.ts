@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Expense, Revenue } from '@/types/transportsType';
+import { Expense, Revenue, Vehicles } from '@/types/transportsType';
 import { createClient } from '@/utils/supabase/client';
 
 export const useFinancialData = () => {
   const [revenues, setRevenues] = useState<Revenue[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicles[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-useEffect(() => {
+  useEffect(() => {
     const loadData = async () => {
       try {
         setLoading(true);
@@ -16,17 +17,19 @@ useEffect(() => {
 
         const supabase = createClient();
 
-        const [revenuesRes, expensesRes] = await Promise.all([
+        const [revenuesRes, expensesRes, vehiclesRes] = await Promise.all([
           supabase.from('revenues').select('*'),
           supabase.from('expenses').select('*'),
+          supabase.from('vehicles').select('*'),
         ]);
 
-        if (revenuesRes.error || expensesRes.error) {
+        if (revenuesRes.error || expensesRes.error || vehiclesRes.error) {
           throw new Error('Erro ao buscar dados do Supabase');
         }
 
         setRevenues(revenuesRes.data || []);
         setExpenses(expensesRes.data || []);
+        setVehicles(vehiclesRes.data || []);
       } catch (err: unknown) {
         console.error('Erro ao carregar dados:', err);
         setError('Erro ao carregar dados');
@@ -57,7 +60,6 @@ useEffect(() => {
       throw err;
     }
   };
-
 
   // Add expense
   const addExpense = async (expense: Omit<Expense, 'id'>) => {
@@ -109,7 +111,69 @@ useEffect(() => {
     }
   };
 
+  // Add vehicle
+  const addVehicle = async (vehicle: Omit<Vehicles, 'id'>) => {
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('vehicles')
+        .insert(vehicle)
+        .select()
+        .single();
 
+      if (error || !data) throw error;
+
+      setVehicles(prev => [data, ...prev]);
+      return data;
+    } catch (err) {
+      setError('Erro ao adicionar veículo');
+      throw err;
+    }
+  };
+
+  // Update vehicle
+  const updateVehicle = async (id: string, updates: Partial<Vehicles>) => {
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('vehicles')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error || !data) throw error;
+
+      setVehicles(prev =>
+        prev.map(v => (v.id === id ? { ...v, ...updates } : v))
+      );
+      return data;
+    } catch (err) {
+      setError('Erro ao atualizar veículo');
+      throw err;
+    }
+  };
+
+  // Toggle vehicle status
+  const toggleVehicleStatus = async (id: string, active: boolean) => {
+    return updateVehicle(id, { active });
+  };
+
+  // Delete vehicle
+  const deleteVehicle = async (id: string) => {
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from('vehicles').delete().eq('id', id);
+      if (error) throw error;
+
+      setVehicles(prev => prev.filter(v => v.id !== id));
+    } catch (err) {
+      setError('Erro ao excluir veículo');
+      throw err;
+    }
+  };
+
+  // Refetch
   const refetch = async () => {
     setLoading(true);
     try {
@@ -134,16 +198,20 @@ useEffect(() => {
     }
   };
 
-
   return {
     revenues,
     expenses,
     loading,
+    vehicles,
     error,
     addRevenue,
     addExpense,
     deleteRevenue,
     deleteExpense,
+    addVehicle,
+    updateVehicle,
+    toggleVehicleStatus,
+    deleteVehicle,
     refetch
   };
 };

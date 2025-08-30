@@ -1,4 +1,4 @@
-import { Expense, Revenue } from "@/types/transportsType";
+import { Revenue } from "@/types/transportsType";
 
 export const mockRevenues: Revenue[] = [
   {
@@ -57,46 +57,44 @@ export const mockRevenues: Revenue[] = [
     service: 'guincho'
   }
 ];
-
-export const mockExpenses: Expense[] = [
-  {
-    id: '1',
-    date: '2025-08-10',
-    description: 'Abastecimento Hilux',
-    category: 'combustivel',
-    amount: 180.00,
-    service: 'locacao'
-  },
-  {
-    id: '2',
-    date: '2025-08-12',
-    description: 'Revisão Voyage',
-    category: 'manutencao',
-    amount: 320.00,
-    service: 'locacao'
-  },
-  {
-    id: '3',
-    date: '2025-08-14',
-    description: 'Combustível Guincho',
-    category: 'combustivel',
-    amount: 150.00,
-    service: 'guincho'
-  },
-  {
-    id: '4',
-    date: '2025-08-16',
-    description: 'Seguro Mensal',
-    category: 'seguro',
-    amount: 280.00,
-    service: 'locacao'
-  },
-  {
-    id: '5',
-    date: '2025-08-19',
-    description: 'Manutenção Preventiva',
-    category: 'manutencao',
-    amount: 450.00,
-    service: 'guincho'
-  }
-];
+//   {
+//     id: '1',
+//     date: '2025-08-10',
+//     description: 'Abastecimento Hilux',
+//     category: 'combustivel',
+//     amount: 180.00,
+//     service: 'locacao'
+//   },
+//   {
+//     id: '2',
+//     date: '2025-08-12',
+//     description: 'Revisão Voyage',
+//     category: 'manutencao',
+//     amount: 320.00,
+//     service: 'locacao'
+//   },
+//   {
+//     id: '3',
+//     date: '2025-08-14',
+//     description: 'Combustível Guincho',
+//     category: 'combustivel',
+//     amount: 150.00,
+//     service: 'guincho'
+//   },
+//   {
+//     id: '4',
+//     date: '2025-08-16',
+//     description: 'Seguro Mensal',
+//     category: 'seguro',
+//     amount: 280.00,
+//     service: 'locacao'
+//   },
+//   {
+//     id: '5',
+//     date: '2025-08-19',
+//     description: 'Manutenção Preventiva',
+//     category: 'manutencao',
+//     amount: 450.00,
+//     service: 'guincho'
+//   }
+// ];

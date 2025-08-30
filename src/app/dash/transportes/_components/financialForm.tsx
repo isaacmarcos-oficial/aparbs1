@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Plus } from 'lucide-react';
-import { ServiceType, Revenue, Expense, VehicleType, PaymentMethod, } from '@/types/transportsType';
+import { ServiceType, Revenue, Expense, VehicleType, PaymentMethod, Vehicles, } from '@/types/transportsType';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
@@ -19,6 +19,7 @@ type FinancialFormData = {
 interface FinancialFormProps {
   type: 'receita' | 'despesa';
   service: ServiceType;
+  vehicles: Vehicles[];
   onSubmitRevenue: (revenue: Omit<Revenue, 'id'>) => void;
   onSubmitExpense: (expense: Omit<Expense, 'id'>) => void;
   onClose: () => void;
@@ -27,6 +28,7 @@ interface FinancialFormProps {
 export const FinancialForm: React.FC<FinancialFormProps> = ({
   type,
   service,
+  vehicles,
   onSubmitRevenue,
   onSubmitExpense,
   onClose
@@ -74,9 +76,10 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
 
         toast.success('Receita cadastrada com sucesso!');
       } else {
-        const { date = '', description = '', category = '', amount = '' } = formData;
+        const { date = '', vehicle = '', description = '', category = '', amount = '' } = formData;
         await onSubmitExpense({
           date,
+          vehicle,
           description,
           category,
           amount: parseFloat(amount),
@@ -102,6 +105,8 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
   const isRevenue = type === 'receita';
   const title = isRevenue ? 'Nova Receita' : 'Nova Despesa';
   const serviceName = service === 'locacao' ? 'Locação' : 'Guincho';
+
+  const activeVehicles = vehicles.filter(v => v.active === true);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -151,6 +156,7 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
                 />
               </div>
 
+
               <div className='col-span-2'>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Cliente
@@ -165,78 +171,60 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Veículo
-                </label>
-                <select
-                  required
-                  value={formData.vehicle}
-                  onChange={(e) => updateFormData('vehicle', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {service === 'locacao' ? (
-                    <>
-                      <option value="hilux">Hilux</option>
-                      <option value="voyage">Voyage</option>
-                      <option value="gol">Gol</option>
-                    </>
-                  ) : (
-                    <option value="guincho">Guincho</option>
-                  )}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Placa
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.plate}
-                  onChange={(e) => updateFormData('plate', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Ex: ABC-1234"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Forma de Pagamento
-                </label>
-                <select
-                  required
-                  value={formData.paymentMethod}
-                  onChange={(e) => updateFormData('paymentMethod', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="dinheiro">Dinheiro</option>
-                  <option value="cartao_credito">Cartão de Crédito</option>
-                  <option value="cartao_debito">Cartão de Débito</option>
-                  <option value="pix">PIX</option>
-                  <option value="transferencia">Transferência</option>
-                </select>
-              </div>
             </>
           )}
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Veículo
+            </label>
+            <select
+              required
+              value={formData.vehicle}
+              onChange={(e) => {
+                const selectedValue = e.target.value;
+                updateFormData('vehicle', selectedValue);
+
+                if (service === 'locacao' || !isRevenue) {
+                  const selectedVehicle = activeVehicles.find(
+                    (v) => `${v.model} - ${v.plate}` === selectedValue
+                  );
+                  if (selectedVehicle) {
+                    updateFormData('plate', selectedVehicle.plate);
+                  }
+                }
+              }}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent uppercase"
+            >
+              {activeVehicles.map((vehicle) => (
+                <option
+                  key={vehicle.id}
+                  value={`${vehicle.model} - ${vehicle.plate}`}
+                  className="uppercase"
+                >
+                  {vehicle.model} - {vehicle.plate}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Placa
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.plate}
+              onChange={(e) => updateFormData('plate', e.target.value)}
+              disabled={service === 'locacao' || !isRevenue}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Ex: ABC-1234"
+            />
+          </div>
+
           {!isRevenue && (
             <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Descrição
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.description}
-                  onChange={(e) => updateFormData('description', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Descrição da despesa"
-                />
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Categoria
@@ -255,8 +243,40 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
                   <option value="outros">Outros</option>
                 </select>
               </div>
+
+              <div className='col-span-2'>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Descrição
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.description}
+                  onChange={(e) => updateFormData('description', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Descrição da despesa"
+                />
+              </div>
             </>
           )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Forma de Pagamento
+            </label>
+            <select
+              required
+              value={formData.paymentMethod}
+              onChange={(e) => updateFormData('paymentMethod', e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="dinheiro">Dinheiro</option>
+              <option value="cartao_credito">Cartão de Crédito</option>
+              <option value="cartao_debito">Cartão de Débito</option>
+              <option value="pix">PIX</option>
+              <option value="transferencia">Transferência</option>
+            </select>
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">

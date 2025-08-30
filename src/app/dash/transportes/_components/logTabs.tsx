@@ -1,5 +1,5 @@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Car, ChartNoAxesCombined, Truck } from "lucide-react";
+import { Car, ChartNoAxesCombined, Settings, Truck } from "lucide-react";
 
 interface LogTabsProps {
   activeService: string;
@@ -13,15 +13,19 @@ export default function LogTabs({ activeService, setActiveService }: LogTabsProp
         <TabsList className="flex items-center space-x-2  rounded-md font-medium transition-all py-6">
           <TabsTrigger className="p-2" value="locacao" onClick={() => setActiveService('locacao')}>
             <Car className="h-5 w-5" />
-            <span>Locação</span>
+            <span className="hidden md:block">Locação</span>
           </TabsTrigger>
           <TabsTrigger className="p-2" value="guincho" onClick={() => setActiveService('guincho')}>
             <Truck className="h-5 w-5" />
-            <span>Guincho</span>
+            <span className="hidden md:block">Guincho</span>
           </TabsTrigger>
           <TabsTrigger className="p-2" value="performance" onClick={() => setActiveService('performance')}>
             <ChartNoAxesCombined className="h-5 w-5" />
-            Desempenho
+            <p className="hidden md:block">Desempenho</p>
+          </TabsTrigger>
+          <TabsTrigger className="p-2" value="vehicles" onClick={() => setActiveService('vehicles')}>
+            <Settings className="h-5 w-5" />
+            <p className="hidden md:block">Veículos</p>
           </TabsTrigger>
         </TabsList>
       </Tabs>
