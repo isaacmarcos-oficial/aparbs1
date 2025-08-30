@@ -94,7 +94,7 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
 
   const getVehicleProfit = (plate: string, model: string) => {
     const revenue = getVehicleRevenue(plate);
-    const expense = getVehicleExpenses(`${model}-${plate}`);
+    const expense = getVehicleExpenses(`${model} - ${plate}`);
     return revenue - expense;
   };
 
@@ -141,7 +141,6 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
               </div>
 
               <Switch checked={vehicle.active} onClick={() => toggleVehicleStatus(vehicle.id, !vehicle.active)} />
-
             </div>
 
             <div className="">
@@ -165,7 +164,7 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">Despesas do Mês:</span>
                 <span className="font-semibold text-red-500">
-                  {formatCurrency(getVehicleExpenses(`${vehicle.model}-${vehicle.plate}`))}
+                  {formatCurrency(getVehicleExpenses(`${vehicle.model} - ${vehicle.plate}`))}
                 </span>
               </div>
 
@@ -182,10 +181,6 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
                   {formatCurrency(getVehicleDailyAverage(vehicle.plate))}
                 </span>
               </div>
-
-              
-
-              
 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">Margem:</span>
