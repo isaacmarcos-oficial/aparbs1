@@ -87,11 +87,13 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
     }
   });
 
-  const expensesByCategory = Array.from(categoryMap.entries()).map(([name, value], index) => ({
-    name,
-    value,
-    color: COLORS[index % COLORS.length]
-  }));
+  const expensesByCategory = Array.from(categoryMap.entries())
+    .map(([name, value], index) => ({
+      name,
+      value,
+      color: COLORS[index % COLORS.length]
+    }))
+    .filter((entry) => entry.value > 0);
 
 
   return (
@@ -127,15 +129,16 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
         <Card className="p-6">
           <h3 className="text-xl font-semibol mb-6">Desempenho Mensal</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={generateMonthlyData(revenues, expenses)}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis dataKey="month" stroke="#9CA3AF" />
-              <YAxis stroke="#9CA3AF" />
+              <YAxis stroke="#9CA3AF" tickFormatter={(value) => formatCurrency(value)} />
               <Tooltip
+                formatter={(value: number) => formatCurrency(value)}
                 contentStyle={{
                   backgroundColor: '#ffffff',
                   border: '1px solid #e5e7eb',
@@ -152,32 +155,53 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
 
         <Card className="p-6">
           <h3 className="text-xl font-semibold mb-6">Despesas por Categoria</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={expensesByCategory}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {expensesByCategory.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  color: '#111827'
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="w-full md:w-2/3">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={expensesByCategory}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {expensesByCategory.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    formatter={(value: number) => formatCurrency(value)}
+                    contentStyle={{
+                      backgroundColor: '#ffffff',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      color: '#111827'
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="flex flex-col md:flex-col justify-center md:w-1/3 space-y-2">
+              {expensesByCategory.map((entry, index) => {
+                const total = expensesByCategory.reduce((sum, e) => sum + e.value, 0);
+                const percent = ((entry.value / total) * 100).toFixed(0);
+                return (
+                  <div key={entry.name} className="flex items-center gap-2 text-sm text-gray-700">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    />
+                    <span className="font-medium">{entry.name}</span>
+                    <span className="text-gray-500">— {percent}%</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </Card>
       </div>
 
@@ -190,6 +214,7 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
             <XAxis dataKey="name" stroke="#9CA3AF" />
             <YAxis stroke="#9CA3AF" />
             <Tooltip
+              formatter={(value: number) => formatCurrency(value)}
               contentStyle={{
                 backgroundColor: '#ffffff',
                 border: '1px solid #e5e7eb',

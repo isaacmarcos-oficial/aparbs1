@@ -17,22 +17,20 @@ interface VehicleViewProps {
 export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus }: VehicleViewProps) {
 
   // Revenues
-  const getVehicleRevenue = (plate: string) => {
+  const getVehicleRevenue = (vehicleKey: string) => {
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
 
-    const total = revenues
+    return revenues
       .filter((rev) => {
         const revDate = new Date(rev.date);
         return (
-          rev.plate === plate &&
+          rev.vehicle === vehicleKey &&
           revDate.getMonth() === currentMonth &&
           revDate.getFullYear() === currentYear
         );
       })
       .reduce((sum, rev) => sum + rev.amount, 0);
-
-    return total;
   };
 
   const getVehicleExpenses = (vehicleKey: string) => {
@@ -52,14 +50,14 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
   };
 
   // Número de ordens de serviço (OS)
-  const getVehicleOSCount = (plate: string) => {
+  const getVehicleOSCount = (vehicleKey: string) => {
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
 
     return revenues.filter((rev) => {
       const revDate = new Date(rev.date);
       return (
-        rev.plate === plate &&
+        rev.vehicle === vehicleKey &&
         revDate.getMonth() === currentMonth &&
         revDate.getFullYear() === currentYear
       );
@@ -67,7 +65,7 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
   };
 
   // Média de receita por dia
-  const getVehicleDailyAverage = (plate: string) => {
+  const getVehicleDailyAverage = (vehicleKey: string) => {
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
 
@@ -78,7 +76,7 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
       const key = revDate.toISOString().split('T')[0];
 
       if (
-        rev.plate === plate &&
+        rev.vehicle === vehicleKey &&
         revDate.getMonth() === currentMonth &&
         revDate.getFullYear() === currentYear
       ) {
@@ -92,17 +90,17 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
     return daysWithRevenue > 0 ? totalRevenue / daysWithRevenue : 0;
   };
 
-  const getVehicleProfit = (plate: string, model: string) => {
-    const revenue = getVehicleRevenue(plate);
-    const expense = getVehicleExpenses(`${model} - ${plate}`);
-    return revenue - expense;
-  };
+  const getVehicleProfit = (vehicleKey: string) => {
+  const revenue = getVehicleRevenue(vehicleKey);
+  const expense = getVehicleExpenses(vehicleKey);
+  return revenue - expense;
+};
 
-  const getVehicleMargin = (plate: string, model: string) => {
-    const revenue = getVehicleRevenue(plate);
-    const expense = getVehicleExpenses(`${model}-${plate}`);
-    return revenue > 0 ? ((revenue - expense) / revenue) * 100 : 0;
-  };
+const getVehicleMargin = (vehicleKey: string) => {
+  const revenue = getVehicleRevenue(vehicleKey);
+  const expense = getVehicleExpenses(vehicleKey);
+  return revenue > 0 ? ((revenue - expense) / revenue) * 100 : 0;
+};
 
   return (
     <div className="">
@@ -119,7 +117,10 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 gap-4">
-        {vehicles.map((vehicle) => (
+        {vehicles.map((vehicle) => {
+          const vehicleKey = `${vehicle.model} - ${vehicle.plate}`;
+
+          return (
           <Card
             key={vehicle.id}
             className={`relative p-4 rounded-xl border transition-all duration-300 ${vehicle.active === true
@@ -147,7 +148,7 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">OS no mês:</span>
                 <span className="font-semibold text-blue-500">
-                  {getVehicleOSCount(vehicle.plate)}
+                  {getVehicleOSCount(vehicleKey)}
                 </span>
               </div>
 
@@ -156,7 +157,7 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
                 <div className={`${vehicle.active === true ? 'text-green-400' : 'text-zinc-400'} flex items-center space-x-1`}>
                   <TrendingUp className="w-3 h-3" />
                   <span className="font-semibold">
-                    {formatCurrency(getVehicleRevenue(vehicle.plate))}
+                    {formatCurrency(getVehicleRevenue(vehicleKey))}
                   </span>
                 </div>
               </div>
@@ -164,33 +165,34 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">Despesas do Mês:</span>
                 <span className="font-semibold text-red-500">
-                  {formatCurrency(getVehicleExpenses(`${vehicle.model} - ${vehicle.plate}`))}
+                  {formatCurrency(getVehicleExpenses(vehicleKey))}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">Lucro Líquido:</span>
                 <span className="font-semibold text-blue-500">
-                  {formatCurrency(getVehicleProfit(vehicle.plate, vehicle.model))}
+                  {formatCurrency(getVehicleProfit(vehicleKey))}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">Média diária:</span>
                 <span className="font-semibold text-indigo-500">
-                  {formatCurrency(getVehicleDailyAverage(vehicle.plate))}
+                  {formatCurrency(getVehicleDailyAverage(vehicleKey))}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-400">Margem:</span>
                 <span className="font-semibold text-indigo-500">
-                  {getVehicleMargin(vehicle.plate, vehicle.model).toFixed(1)}%
+                  {getVehicleMargin(vehicleKey).toFixed(1)}%
                 </span>
               </div>
             </div>
           </Card>
-        ))}
+          )
+        })}
       </div>
     </div>
   );
