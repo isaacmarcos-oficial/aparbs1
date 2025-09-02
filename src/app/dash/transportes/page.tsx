@@ -15,6 +15,8 @@ import { MonthSelector } from "./_components/monthSelector";
 export default function Page() {
   const [activeService, setActiveService] = useState<ServiceType>('locacao');
   const [showForm, setShowForm] = useState(false);
+  const [editingRevenue, setEditingRevenue] = useState<Revenue | null>(null);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [formType, setFormType] = useState<'receita' | 'despesa'>('receita');
   const [selectedMonth, setSelectedMonth] = useState(() => {
     const today = new Date();
@@ -30,6 +32,8 @@ export default function Page() {
     loading,
     addRevenue,
     addExpense,
+    updateRevenue,
+    updateExpense,
     deleteRevenue,
     deleteExpense,
     toggleVehicleStatus
@@ -54,6 +58,30 @@ export default function Page() {
     } catch (error: unknown) {
       toast.error('Erro ao adicionar despesa')
       console.error('Error adding expense:', error);
+    }
+  };
+
+  const handleEditRevenue = async (updated: Omit<Revenue, 'id'>) => {
+    if (!editingRevenue) return;
+    try {
+      await updateRevenue(editingRevenue.id, updated);
+      toast.success('Receita atualizada com sucesso!');
+      setEditingRevenue(null);
+    } catch (error) {
+      toast.error('Erro ao atualizar receita');
+      console.error('Error updating revenue:', error);
+    }
+  };
+
+  const handleEditExpense = async (updated: Omit<Expense, 'id'>) => {
+    if (!editingExpense) return;
+    try {
+      await updateExpense(editingExpense.id, updated);
+      toast.success('Despesa atualizada com sucesso!');
+      setEditingExpense(null);
+    } catch (error) {
+      toast.error('Erro ao atualizar despesa');
+      console.error('Error updating expense:', error);
     }
   };
 
@@ -104,6 +132,14 @@ export default function Page() {
           selectedMonth={selectedMonth}
           onAddRevenue={() => openForm('receita')}
           onAddExpense={() => openForm('despesa')}
+          onEditRevenue={(revenue) => {
+            setFormType('receita');
+            setEditingRevenue(revenue);
+          }}
+          onEditExpense={(expense) => {
+            setFormType('despesa');
+            setEditingExpense(expense);
+          }}
           onDeleteRevenue={deleteRevenue}
           onDeleteExpense={deleteExpense}
         />
@@ -126,15 +162,29 @@ export default function Page() {
         />
       )}
 
-      <Dialog open={showForm} onOpenChange={(open) => !open && setShowForm(false)}>
+      <Dialog
+        open={showForm || editingRevenue !== null || editingExpense !== null}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowForm(false);
+            setEditingRevenue(null);
+            setEditingExpense(null);
+          }
+        }}
+      >
         <DialogContent>
           <FinancialForm
             type={formType}
             service={activeService}
             vehicles={vehicles}
-            onSubmitRevenue={handleAddRevenue}
-            onSubmitExpense={handleAddExpense}
-            onClose={() => setShowForm(false)}
+            onSubmitRevenue={editingRevenue ? handleEditRevenue : handleAddRevenue}
+            onSubmitExpense={editingExpense ? handleEditExpense : handleAddExpense}
+            onClose={() => {
+              setShowForm(false);
+              setEditingRevenue(null);
+              setEditingExpense(null);
+            }}
+            initialData={editingRevenue || editingExpense || undefined}
           />
         </DialogContent>
       </Dialog>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { CreditCard, Tag, Trash2 } from 'lucide-react';
+import { CreditCard, Pencil, Tag, Trash2 } from 'lucide-react';
 import { formatCurrency } from '@/utils/financials';
 import { Expense } from '@/types/transportsType';
 import { Badge } from '@/components/ui/badge';
@@ -8,9 +8,10 @@ import moment from 'moment';
 interface ExpenseTableProps {
   expenses: Expense[];
   onDelete?: (id: string) => void;
+  onEdit?: (expense: Expense) => void;
 }
 
-export const ExpenseTable: React.FC<ExpenseTableProps> = ({ expenses, onDelete }) => {
+export const ExpenseTable: React.FC<ExpenseTableProps> = ({ expenses, onEdit, onDelete }) => {
   return (
     <div className="rounded-lg shadow-sm border overflow-x-auto">
       {expenses.length > 0 ? (
@@ -61,8 +62,9 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({ expenses, onDelete }
                     {formatCurrency(expense.amount)}
                   </span>
                 </td>
-                {onDelete && (
-                  <td className="px-6 py-4 whitespace-nowrap">
+                <td className="flex items-center px-6 py-6 whitespace-nowrap gap-4">
+                  {onDelete && (
+
                     <button
                       onClick={() => onDelete(expense.id)}
                       className="text-red-600 hover:text-red-800 transition-colors"
@@ -70,8 +72,17 @@ export const ExpenseTable: React.FC<ExpenseTableProps> = ({ expenses, onDelete }
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
-                  </td>
-                )}
+                  )}
+                  {onEdit && (
+                    <button
+                      onClick={() => onEdit(expense)}
+                      className="text-blue-600 hover:text-blue-800 transition-colors"
+                      title="Editar receita"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>

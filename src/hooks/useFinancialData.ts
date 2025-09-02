@@ -90,6 +90,63 @@ export const useFinancialData = () => {
     }
   };
 
+  // Update revenue
+  const updateRevenue = async (id: string, updates: Partial<Revenue>) => {
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('revenues')
+        .update(updates)
+        .eq('id', id)
+        .select()
+
+      console.log("id", id)
+      console.log("updates", updates)
+      console.log("data", data)
+
+      if (error || !data) throw error;
+
+      setRevenues(prev =>
+        prev.map(r => (r.id === id ? { ...r, ...updates } : r))
+      );
+
+      toast.success('Receita atualizada com sucesso!');
+      return data;
+    } catch (err) {
+      console.error('Erro ao atualizar receita:', err);
+      setError('Erro ao atualizar receita');
+      toast.error('Erro ao atualizar receita');
+      throw err;
+    }
+  };
+
+  // Update expense
+  const updateExpense = async (id: string, updates: Partial<Expense>) => {
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('expenses')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error || !data) throw error;
+
+      setExpenses(prev =>
+        prev.map(e => (e.id === id ? { ...e, ...updates } : e))
+      );
+
+      toast.success('Despesa atualizada com sucesso!');
+      return data;
+    } catch (err) {
+      console.error('Erro ao atualizar despesa:', err);
+      setError('Erro ao atualizar despesa');
+      toast.error('Erro ao atualizar despesa');
+      throw err;
+    }
+  };
+
   // Delete revenue
   const deleteRevenue = async (id: string) => {
     console.log("Deleting revenue with ID:", id);
@@ -222,6 +279,8 @@ export const useFinancialData = () => {
     error,
     addRevenue,
     addExpense,
+    updateRevenue,
+    updateExpense,
     deleteRevenue,
     deleteExpense,
     addVehicle,

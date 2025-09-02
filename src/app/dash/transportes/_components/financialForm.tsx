@@ -29,26 +29,33 @@ interface FinancialFormProps {
   onSubmitRevenue: (revenue: Omit<Revenue, 'id'>) => void;
   onSubmitExpense: (expense: Omit<Expense, 'id'>) => void;
   onClose: () => void;
+  initialData?: Partial<Revenue | Expense>
 }
 
 export const FinancialForm: React.FC<FinancialFormProps> = ({
   type,
   service,
   vehicles,
+  initialData,
   onSubmitRevenue,
   onSubmitExpense,
   onClose
 }) => {
-  const [formData, setFormData] = useState<FinancialFormData>({
-    date: new Date().toISOString().split('T')[0],
-    osNumber: '',
-    client: '',
-    vehicle: service === 'locacao' ? 'hilux' : 'guincho',
-    plate: '',
-    paymentMethod: 'dinheiro',
-    amount: '',
-    description: '',
-    category: ''
+  const [formData, setFormData] = useState<FinancialFormData>(() => {
+    const isRevenue = type === 'receita';
+    const safeData = initialData ?? {}; // garante que não seja undefined
+
+    return {
+      date: safeData.date || new Date().toISOString().split('T')[0],
+      osNumber: isRevenue ? (safeData as Revenue).osNumber ?? '' : '',
+      client: isRevenue ? (safeData as Revenue).client ?? '' : '',
+      vehicle: safeData.vehicle ?? (service === 'locacao' ? 'hilux' : 'guincho'),
+      plate: isRevenue ? (safeData as Revenue).plate ?? '' : '',
+      paymentMethod: isRevenue ? (safeData as Revenue).paymentMethod ?? 'dinheiro' : 'dinheiro',
+      amount: safeData.amount?.toString() ?? '',
+      description: !isRevenue ? (safeData as Expense).description ?? '' : '',
+      category: !isRevenue ? (safeData as Expense).category ?? '' : '',
+    };
   });
   const [loading, setLoading] = useState(false);
 
@@ -57,7 +64,10 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
     setLoading(true);
 
     try {
-      if (type === 'receita') {
+      const isEditing = !!initialData;
+      const isRevenue = type === 'receita';
+
+      if (isRevenue) {
         const {
           date = '',
           osNumber = '',
@@ -67,7 +77,6 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
           paymentMethod = 'dinheiro',
           amount = '',
         } = formData;
-
 
         await onSubmitRevenue({
           date,
@@ -80,9 +89,16 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
           service,
         });
 
-        toast.success('Receita cadastrada com sucesso!');
+        toast.success(isEditing ? 'Receita atualizada com sucesso!' : 'Receita cadastrada com sucesso!');
       } else {
-        const { date = '', vehicle = '', description = '', category = '', amount = '' } = formData;
+        const {
+          date = '',
+          vehicle = '',
+          description = '',
+          category = '',
+          amount = '',
+        } = formData;
+
         await onSubmitExpense({
           date,
           vehicle,
@@ -92,12 +108,12 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
           service,
         });
 
-        toast.success('Despesa cadastrada com sucesso!');
+        toast.success(isEditing ? 'Despesa atualizada com sucesso!' : 'Despesa cadastrada com sucesso!');
       }
 
       onClose();
     } catch (error: unknown) {
-      toast.error('Erro ao cadastrar receita/despesa.');
+      toast.error('Erro ao salvar receita/despesa.');
       console.error('Error submitting form:', error);
     } finally {
       setLoading(false);
@@ -109,7 +125,9 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
   };
 
   const isRevenue = type === 'receita';
-  const title = isRevenue ? 'Nova Receita' : 'Nova Despesa';
+  const title = initialData
+    ? isRevenue ? 'Editar Receita' : 'Editar Despesa'
+    : isRevenue ? 'Nova Receita' : 'Nova Despesa';
   const serviceName = service === 'locacao' ? 'Locação' : 'Guincho';
 
   const activeVehicles = vehicles.filter(v => v.active === true);
@@ -120,7 +138,7 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
 
   return (
     <div className="">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='space-y-4'>
         <div className="">
           <div className="flex items-center gap-2">
             <DialogTitle className="text-lg font-semibold text-gray-900">{title}</DialogTitle>
@@ -329,7 +347,7 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
 
         </div>
 
-        <div className="flex">
+        <div className="flex gap-4">
           <Button
             variant="outline"
             type="button"

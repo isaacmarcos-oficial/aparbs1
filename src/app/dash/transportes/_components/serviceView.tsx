@@ -14,6 +14,8 @@ interface ServiceViewProps {
   selectedMonth: string;
   onAddRevenue: () => void;
   onAddExpense: () => void;
+  onEditRevenue?: (revenue: Revenue) => void;
+  onEditExpense?: (expense: Expense) => void;
   onDeleteRevenue: (id: string) => void;
   onDeleteExpense: (id: string) => void;
 }
@@ -25,6 +27,8 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
   selectedMonth,
   onAddRevenue,
   onAddExpense,
+  onEditRevenue,
+  onEditExpense,
   onDeleteRevenue,
   onDeleteExpense,
 }) => (
@@ -64,10 +68,19 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
           </TabsTrigger>
         </TabsList>
         <TabsContent value="revenues">
-          <RevenueTable revenues={revenues} service={service} onDelete={onDeleteRevenue} />
+          <RevenueTable
+            revenues={revenues}
+            service={service}
+            onDelete={onDeleteRevenue}
+            onEdit={onEditRevenue}
+          />
         </TabsContent>
         <TabsContent value="expenses">
-          <ExpenseTable expenses={expenses} onDelete={onDeleteExpense} />
+          <ExpenseTable
+            expenses={expenses}
+            onDelete={onDeleteExpense}
+            onEdit={onEditExpense}
+          />
         </TabsContent>
       </Tabs>
     </div>

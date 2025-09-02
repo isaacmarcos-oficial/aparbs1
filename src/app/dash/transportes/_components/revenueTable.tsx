@@ -1,5 +1,5 @@
 import React from 'react';
-import { Receipt, Trash2 } from 'lucide-react';
+import { Pencil, Receipt, Trash2 } from 'lucide-react';
 import { formatCurrency, getPaymentMethodName } from '@/utils/financials';
 import { Revenue, ServiceType } from '@/types/transportsType';
 import { Badge } from '@/components/ui/badge';
@@ -9,9 +9,10 @@ interface RevenueTableProps {
   revenues: Revenue[];
   service: ServiceType;
   onDelete?: (id: string) => void;
+  onEdit?: (revenue: Revenue) => void;
 }
 
-export const RevenueTable: React.FC<RevenueTableProps> = ({ revenues, service, onDelete }) => {
+export const RevenueTable: React.FC<RevenueTableProps> = ({ revenues, service, onEdit, onDelete }) => {
 
   return (
     <div className="rounded-lg shadow-sm border overflow-x-auto">
@@ -75,17 +76,26 @@ export const RevenueTable: React.FC<RevenueTableProps> = ({ revenues, service, o
                     {getPaymentMethodName(revenue.paymentMethod)}
                   </div>
                 </td>
-                {onDelete && (
-                  <td className="px-6 py-4 whitespace-nowrap">
+                <td className="flex items-center px-6 py-6 whitespace-nowrap gap-4">
+                  {onDelete && (
                     <button
                       onClick={() => onDelete(revenue.id)}
-                      className="text-red-600 hover:text-red-800 transition-colors"
+                      className="text-zinc-500 hover:text-red-800 transition-colors"
                       title="Excluir receita"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
-                  </td>
-                )}
+                  )}
+                  {onEdit && (
+                    <button
+                      onClick={() => onEdit(revenue)}
+                      className="text-zinc-500 hover:text-blue-500 transition-colors"
+                      title="Editar receita"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
