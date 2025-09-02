@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Expense, Revenue, Vehicles } from '@/types/transportsType';
 import { createClient } from '@/utils/supabase/client';
+import { toast } from 'sonner';
 
 export const useFinancialData = () => {
   const [revenues, setRevenues] = useState<Revenue[]>([]);
@@ -89,17 +90,25 @@ export const useFinancialData = () => {
     }
   };
 
-
   // Delete revenue
   const deleteRevenue = async (id: string) => {
+    console.log("Deleting revenue with ID:", id);
     try {
       const supabase = createClient();
       const { error } = await supabase.from('revenues').delete().eq('id', id);
-      if (error) throw error;
+
+      if (error) {
+        console.error("Supabase delete error:", error);
+        toast.error('Erro ao excluir receita');
+        throw error;
+      }
 
       setRevenues(prev => prev.filter(r => r.id !== id));
+      toast.success('Receita excluída com sucesso!');
     } catch (err) {
+      console.error("Error deleting revenue:", err);
       setError('Erro ao excluir receita');
+      toast.error('Erro inesperado ao excluir receita');
       throw err;
     }
   };

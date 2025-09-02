@@ -59,14 +59,6 @@ export default function Page() {
 
   const isPerformanceView = activeService === 'performance';
 
-  // const filteredRevenues = isPerformanceView
-  //   ? revenues
-  //   : revenues.filter(revenue => revenue.service === activeService);
-
-  // const filteredExpenses = isPerformanceView
-  //   ? expenses
-  //   : expenses.filter(expense => expense.service === activeService);
-
   const filteredRevenues = revenues.filter(revenue => {
     const revenueMonth = revenue.date.slice(0, 7); // "YYYY-MM"
     const matchesService = isPerformanceView || revenue.service === activeService;
