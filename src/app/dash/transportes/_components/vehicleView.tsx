@@ -11,22 +11,21 @@ interface VehicleViewProps {
   vehicles: Vehicles[];
   revenues: Revenue[];
   expenses: Expense[];
+  selectedMonth: string;
   toggleVehicleStatus: (vehicleId: string, active: boolean) => void;
 }
 
-export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus }: VehicleViewProps) {
-
+export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggleVehicleStatus }: VehicleViewProps) {
+  const [currentYear, currentMonth] = selectedMonth.split('-').map(Number);
   // Revenues
   const getVehicleRevenue = (vehicleKey: string) => {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
 
     return revenues
       .filter((rev) => {
         const revDate = new Date(rev.date);
         return (
           rev.vehicle === vehicleKey &&
-          revDate.getMonth() === currentMonth &&
+          revDate.getMonth() === currentMonth -1 &&
           revDate.getFullYear() === currentYear
         );
       })
@@ -34,15 +33,12 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
   };
 
   const getVehicleExpenses = (vehicleKey: string) => {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-
     return expenses
       .filter((exp) => {
         const expDate = new Date(exp.date);
         return (
           exp.vehicle === vehicleKey &&
-          expDate.getMonth() === currentMonth &&
+          expDate.getMonth() === currentMonth -1&&
           expDate.getFullYear() === currentYear
         );
       })
@@ -51,14 +47,11 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
 
   // Número de ordens de serviço (OS)
   const getVehicleOSCount = (vehicleKey: string) => {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-
     return revenues.filter((rev) => {
       const revDate = new Date(rev.date);
       return (
         rev.vehicle === vehicleKey &&
-        revDate.getMonth() === currentMonth &&
+        revDate.getMonth() === currentMonth -1 &&
         revDate.getFullYear() === currentYear
       );
     }).length;
@@ -66,9 +59,6 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
 
   // Média de receita por dia
   const getVehicleDailyAverage = (vehicleKey: string) => {
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-
     const dailyTotals = new Map<string, number>();
 
     revenues.forEach((rev) => {
@@ -77,7 +67,7 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
 
       if (
         rev.vehicle === vehicleKey &&
-        revDate.getMonth() === currentMonth &&
+        revDate.getMonth() === currentMonth -1 &&
         revDate.getFullYear() === currentYear
       ) {
         dailyTotals.set(key, (dailyTotals.get(key) || 0) + rev.amount);
@@ -91,16 +81,16 @@ export function VehicleView({ vehicles, revenues, expenses, toggleVehicleStatus 
   };
 
   const getVehicleProfit = (vehicleKey: string) => {
-  const revenue = getVehicleRevenue(vehicleKey);
-  const expense = getVehicleExpenses(vehicleKey);
-  return revenue - expense;
-};
+    const revenue = getVehicleRevenue(vehicleKey);
+    const expense = getVehicleExpenses(vehicleKey);
+    return revenue - expense;
+  };
 
-const getVehicleMargin = (vehicleKey: string) => {
-  const revenue = getVehicleRevenue(vehicleKey);
-  const expense = getVehicleExpenses(vehicleKey);
-  return revenue > 0 ? ((revenue - expense) / revenue) * 100 : 0;
-};
+  const getVehicleMargin = (vehicleKey: string) => {
+    const revenue = getVehicleRevenue(vehicleKey);
+    const expense = getVehicleExpenses(vehicleKey);
+    return revenue > 0 ? ((revenue - expense) / revenue) * 100 : 0;
+  };
 
   return (
     <div className="">
@@ -121,76 +111,76 @@ const getVehicleMargin = (vehicleKey: string) => {
           const vehicleKey = `${vehicle.model} - ${vehicle.plate}`;
 
           return (
-          <Card
-            key={vehicle.id}
-            className={`relative p-4 rounded-xl border transition-all duration-300 ${vehicle.active === true
-              ? 'bg-green-100/10 border-green-600/30'
-              : 'bg-red-600/5 border-red-600/30'
-              }`}
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className={`p-2 rounded-lg ${vehicle.active === true ? 'bg-green-500/10' : 'bg-red-500/20'
-                  }`}>
-                  <Car className={`w-5 h-5 ${vehicle.active === true ? 'text-green-400' : 'text-red-400'
-                    }`} />
+            <Card
+              key={vehicle.id}
+              className={`relative p-4 rounded-xl border transition-all duration-300 ${vehicle.active === true
+                ? 'bg-green-100/10 border-green-600/30'
+                : 'bg-red-600/5 border-red-600/30'
+                }`}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className={`p-2 rounded-lg ${vehicle.active === true ? 'bg-green-500/10' : 'bg-red-500/20'
+                    }`}>
+                    <Car className={`w-5 h-5 ${vehicle.active === true ? 'text-green-400' : 'text-red-400'
+                      }`} />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold uppercase text-sm">{vehicle.model}</h4>
+                    <p className="text-xs text-muted-foreground">{vehicle.plate}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-semibold uppercase text-sm">{vehicle.model}</h4>
-                  <p className="text-xs text-muted-foreground">{vehicle.plate}</p>
-                </div>
+
+                <Switch checked={vehicle.active} onClick={() => toggleVehicleStatus(vehicle.id, !vehicle.active)} />
               </div>
 
-              <Switch checked={vehicle.active} onClick={() => toggleVehicleStatus(vehicle.id, !vehicle.active)} />
-            </div>
+              <div className="">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">OS no mês:</span>
+                  <span className="font-semibold text-blue-500">
+                    {getVehicleOSCount(vehicleKey)}
+                  </span>
+                </div>
 
-            <div className="">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">OS no mês:</span>
-                <span className="font-semibold text-blue-500">
-                  {getVehicleOSCount(vehicleKey)}
-                </span>
-              </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">Receita do Mês:</span>
+                  <div className={`${vehicle.active === true ? 'text-green-400' : 'text-zinc-400'} flex items-center space-x-1`}>
+                    <TrendingUp className="w-3 h-3" />
+                    <span className="font-semibold">
+                      {formatCurrency(getVehicleRevenue(vehicleKey))}
+                    </span>
+                  </div>
+                </div>
 
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">Receita do Mês:</span>
-                <div className={`${vehicle.active === true ? 'text-green-400' : 'text-zinc-400'} flex items-center space-x-1`}>
-                  <TrendingUp className="w-3 h-3" />
-                  <span className="font-semibold">
-                    {formatCurrency(getVehicleRevenue(vehicleKey))}
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">Despesas do Mês:</span>
+                  <span className="font-semibold text-red-500">
+                    {formatCurrency(getVehicleExpenses(vehicleKey))}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">Lucro Líquido:</span>
+                  <span className="font-semibold text-blue-500">
+                    {formatCurrency(getVehicleProfit(vehicleKey))}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">Média diária:</span>
+                  <span className="font-semibold text-indigo-500">
+                    {formatCurrency(getVehicleDailyAverage(vehicleKey))}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-400">Margem:</span>
+                  <span className="font-semibold text-indigo-500">
+                    {getVehicleMargin(vehicleKey).toFixed(1)}%
                   </span>
                 </div>
               </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">Despesas do Mês:</span>
-                <span className="font-semibold text-red-500">
-                  {formatCurrency(getVehicleExpenses(vehicleKey))}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">Lucro Líquido:</span>
-                <span className="font-semibold text-blue-500">
-                  {formatCurrency(getVehicleProfit(vehicleKey))}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">Média diária:</span>
-                <span className="font-semibold text-indigo-500">
-                  {formatCurrency(getVehicleDailyAverage(vehicleKey))}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-400">Margem:</span>
-                <span className="font-semibold text-indigo-500">
-                  {getVehicleMargin(vehicleKey).toFixed(1)}%
-                </span>
-              </div>
-            </div>
-          </Card>
+            </Card>
           )
         })}
       </div>

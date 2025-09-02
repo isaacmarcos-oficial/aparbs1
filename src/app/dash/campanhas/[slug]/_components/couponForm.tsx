@@ -87,7 +87,6 @@ export function CouponForm({ onSubmit, campaignId }: CouponFormProps) {
     try {
       setImportError(null);
       const data = await importFromFile(file, campaignId);
-      console.log(data)
 
       for (const record of data) {
         const fullData = {

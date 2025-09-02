@@ -8,15 +8,17 @@ interface FinancialSummaryProps {
   revenues: Revenue[];
   expenses: Expense[];
   service: ServiceType;
+  selectedMonth: string;
 }
 
 export const FinancialSummary: React.FC<FinancialSummaryProps> = ({
   revenues,
   expenses,
-  service
+  service,
+  selectedMonth
 }) => {
-  const monthlyRevenues = getCurrentMonthRevenues(revenues);
-  const monthlyExpenses = getCurrentMonthExpenses(expenses);
+  const monthlyRevenues = getCurrentMonthRevenues(revenues, selectedMonth);
+  const monthlyExpenses = getCurrentMonthExpenses(expenses, selectedMonth);
   const totalRevenue = monthlyRevenues.reduce((sum: number, rev: { amount: number } ) => sum + rev.amount, 0);
   const totalExpenses = monthlyExpenses.reduce((sum: number, exp: { amount: number }) => sum + exp.amount, 0);
   const profit = totalRevenue - totalExpenses;

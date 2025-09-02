@@ -27,8 +27,16 @@ export const useFinancialData = () => {
           throw new Error('Erro ao buscar dados do Supabase');
         }
 
-        setRevenues(revenuesRes.data || []);
-        setExpenses(expensesRes.data || []);
+        const sortedRevenues = (revenuesRes.data || []).sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+
+        const sortedExpenses = (expensesRes.data || []).sort(
+          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+
+        setRevenues(sortedRevenues);
+        setExpenses(sortedExpenses);
         setVehicles(vehiclesRes.data || []);
       } catch (err: unknown) {
         console.error('Erro ao carregar dados:', err);
@@ -95,7 +103,6 @@ export const useFinancialData = () => {
       throw err;
     }
   };
-
 
   // Delete expense
   const deleteExpense = async (id: string) => {

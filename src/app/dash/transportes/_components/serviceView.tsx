@@ -4,11 +4,14 @@ import { FinancialSummary } from './financialSummary';
 import { MonthlyChart } from './monthlyChart';
 import { RevenueTable } from './revenueTable';
 import { ExpenseTable } from './expenseTable';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CreditCard, Receipt } from 'lucide-react';
 
 interface ServiceViewProps {
   service: ServiceType;
   revenues: Revenue[];
   expenses: Expense[];
+  selectedMonth: string;
   onAddRevenue: () => void;
   onAddExpense: () => void;
   onDeleteRevenue: (id: string) => void;
@@ -19,16 +22,17 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
   service,
   revenues,
   expenses,
+  selectedMonth,
   onAddRevenue,
   onAddExpense,
   onDeleteRevenue,
   onDeleteExpense,
 }) => (
-  <>
-    <FinancialSummary expenses={expenses} revenues={revenues} service={service} />
+  <div className='flex flex-col gap-8'>
+    <FinancialSummary expenses={expenses} revenues={revenues} service={service} selectedMonth={selectedMonth} />
 
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-      <MonthlyChart revenues={revenues} expenses={expenses} service={service} />
+      <MonthlyChart revenues={revenues} expenses={expenses} service={service} selectedMonth={selectedMonth} />
 
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h3>
@@ -43,9 +47,29 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
       </div>
     </div>
 
-    <div className="w-full grid grid-cols-1 xl:grid-cols-2 gap-8">
-      <RevenueTable revenues={revenues} service={service} onDelete={onDeleteRevenue} />
-      <ExpenseTable expenses={expenses} service={service} onDelete={onDeleteExpense} />
+    <div className="w-full">
+      <Tabs defaultValue="revenues" className=''>
+        <TabsList>
+          <TabsTrigger value="revenues" className='data-[state=active]:text-green-500'>
+            <Receipt className="h-5 w-5" />
+            <h3 className="">
+              Receitas - {service === 'locacao' ? 'Locação' : 'Guincho'}
+            </h3>
+          </TabsTrigger>
+          <TabsTrigger value="expenses" className='data-[state=active]:text-red-600'>
+            <CreditCard className="h-5 w-5" />
+            <h3 className="">
+              Despesas - {service === 'locacao' ? 'Locação' : 'Guincho'}
+            </h3>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="revenues">
+          <RevenueTable revenues={revenues} service={service} onDelete={onDeleteRevenue} />
+        </TabsContent>
+        <TabsContent value="expenses">
+          <ExpenseTable expenses={expenses} onDelete={onDeleteExpense} />
+        </TabsContent>
+      </Tabs>
     </div>
-  </>
+  </div>
 );

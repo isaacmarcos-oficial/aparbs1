@@ -1,30 +1,41 @@
 import React from 'react';
 import { BarChart3 } from 'lucide-react';
-import {  Revenue, Expense, ServiceType } from '@/types/transportsType';
+import { Revenue, Expense, ServiceType } from '@/types/transportsType';
 import { formatCurrency, getMonthlyData } from '@/utils/financials';
 
 interface MonthlyChartProps {
   revenues: Revenue[];
   expenses: Expense[];
   service: ServiceType;
+  selectedMonth: string
 }
 
 export const MonthlyChart: React.FC<MonthlyChartProps> = ({
   revenues,
   expenses,
-  service
+  service,
+  selectedMonth
 }) => {
-  const monthlyData = getMonthlyData(revenues, expenses);
+  const filteredRevenues = service === 'performance'
+    ? revenues
+    : revenues.filter(rev => rev.service === service && rev.date.slice(0, 7) === selectedMonth);
+
+  const filteredExpenses = service === 'performance'
+    ? expenses
+    : expenses.filter(exp => exp.service === service && exp.date.slice(0, 7) === selectedMonth);
+
+  const monthlyData = getMonthlyData(filteredRevenues, filteredExpenses);
+
   const maxAmount = Math.max(
     ...monthlyData.map(data => Math.max(data.revenue, data.expense))
   );
 
   const serviceName =
-  service === 'performance'
-    ? 'Consolidado'
-    : service === 'locacao'
-    ? 'Locação'
-    : 'Guincho';
+    service === 'performance'
+      ? 'Consolidado'
+      : service === 'locacao'
+        ? 'Locação'
+        : 'Guincho';
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6">
@@ -49,22 +60,22 @@ export const MonthlyChart: React.FC<MonthlyChartProps> = ({
                 </span>
               </div>
             </div>
-            
+
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
                 <div className="w-16 text-xs text-gray-500">Receita</div>
                 <div className="flex-1 bg-gray-100 rounded-full h-3 relative overflow-hidden">
-                  <div 
+                  <div
                     className="bg-green-500 h-full rounded-full transition-all duration-500"
                     style={{ width: `${maxAmount > 0 ? (data.revenue / maxAmount) * 100 : 0}%` }}
                   />
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <div className="w-16 text-xs text-gray-500">Despesa</div>
                 <div className="flex-1 bg-gray-100 rounded-full h-3 relative overflow-hidden">
-                  <div 
+                  <div
                     className="bg-red-500 h-full rounded-full transition-all duration-500"
                     style={{ width: `${maxAmount > 0 ? (data.expense / maxAmount) * 100 : 0}%` }}
                   />

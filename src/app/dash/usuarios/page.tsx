@@ -27,8 +27,6 @@ export default function Page() {
       });
   }, []);
 
-  console.log(userData)
-
   return (
     <div className="">
       <div className="flex justify-between w-full">
