@@ -17,12 +17,16 @@ interface VehicleViewProps {
 
 export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggleVehicleStatus }: VehicleViewProps) {
   const [currentYear, currentMonth] = selectedMonth.split('-').map(Number);
+  const parseLocalDate = (dateStr: string): Date => {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day); // mês começa do zero
+};
+
   // Revenues
   const getVehicleRevenue = (vehicleKey: string) => {
-
     return revenues
       .filter((rev) => {
-        const revDate = new Date(rev.date);
+        const revDate = parseLocalDate(rev.date);
         return (
           rev.vehicle === vehicleKey &&
           revDate.getMonth() === currentMonth -1 &&
@@ -32,10 +36,11 @@ export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggl
       .reduce((sum, rev) => sum + rev.amount, 0);
   };
 
+  // Expenses
   const getVehicleExpenses = (vehicleKey: string) => {
     return expenses
       .filter((exp) => {
-        const expDate = new Date(exp.date);
+        const expDate = parseLocalDate(exp.date);
         return (
           exp.vehicle === vehicleKey &&
           expDate.getMonth() === currentMonth -1&&
@@ -48,7 +53,7 @@ export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggl
   // Número de ordens de serviço (OS)
   const getVehicleOSCount = (vehicleKey: string) => {
     return revenues.filter((rev) => {
-      const revDate = new Date(rev.date);
+      const revDate = parseLocalDate(rev.date);
       return (
         rev.vehicle === vehicleKey &&
         revDate.getMonth() === currentMonth -1 &&
@@ -62,7 +67,7 @@ export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggl
     const dailyTotals = new Map<string, number>();
 
     revenues.forEach((rev) => {
-      const revDate = new Date(rev.date);
+      const revDate = parseLocalDate(rev.date);
       const key = revDate.toISOString().split('T')[0];
 
       if (

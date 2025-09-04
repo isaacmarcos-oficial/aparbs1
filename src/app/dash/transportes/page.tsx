@@ -159,6 +159,7 @@ export default function Page() {
         <PerformanceView
           revenues={revenues}
           expenses={expenses}
+          selectedMonth={selectedMonth}
         />
       )}
 

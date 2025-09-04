@@ -3,27 +3,46 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { formatCurrency } from '@/utils/financials';
 import { Expense, Revenue } from '@/types/transportsType';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 interface PerformanceViewProps {
   revenues: Revenue[];
   expenses: Expense[];
+  selectedMonth: string;
 }
 
-export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
+export function PerformanceView({ revenues, expenses, selectedMonth }: PerformanceViewProps) {
+  const [currentYear, currentMonth] = selectedMonth.split('-').map(Number);
+
+  const parseLocalDate = (dateStr: string): Date => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
+
+  const monthlyRevenues = revenues.filter((r) => {
+    const date = parseLocalDate(r.date);
+    return date.getFullYear() === currentYear && date.getMonth() === currentMonth - 1;
+  });
+
+  const monthlyExpenses = expenses.filter((e) => {
+    const date = parseLocalDate(e.date);
+    return date.getFullYear() === currentYear && date.getMonth() === currentMonth - 1;
+  });
+
   // Calculate totals for both services
-  const locacaoRevenue = revenues
+  const locacaoRevenue = monthlyRevenues
     .filter(r => r.service === 'locacao')
     .reduce((sum, r) => sum + r.amount, 0);
 
-  const guinchoRevenue = revenues
+  const guinchoRevenue = monthlyRevenues
     .filter(r => r.service === 'guincho')
     .reduce((sum, r) => sum + r.amount, 0);
 
-  const locacaoExpense = expenses
+  const locacaoExpense = monthlyExpenses
     .filter(e => e.service === 'locacao')
     .reduce((sum, e) => sum + e.amount, 0);
 
-  const guinchoExpense = expenses
+  const guinchoExpense = monthlyExpenses
     .filter(e => e.service === 'guincho')
     .reduce((sum, e) => sum + e.amount, 0);
 
@@ -45,7 +64,7 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
     }
 
     revenues.forEach((r) => {
-      const date = new Date(r.date);
+      const date = parseLocalDate(r.date);
       const month = date.getMonth();
       if (r.service === 'locacao' || r.service === 'guincho') {
         monthlyMap.get(month)![r.service] += r.amount;
@@ -53,7 +72,7 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
     });
 
     expenses.forEach((e) => {
-      const date = new Date(e.date);
+      const date = parseLocalDate(e.date);
       const month = date.getMonth();
       if (e.service === 'locacao' || e.service === 'guincho') {
         monthlyMap.get(month)![e.service] -= e.amount;
@@ -76,15 +95,8 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
 
   const categoryMap = new Map<string, number>();
 
-  expenses.forEach(exp => {
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    const expDate = new Date(exp.date);
-
-    if (expDate.getMonth() === currentMonth && expDate.getFullYear() === currentYear) {
-      categoryMap.set(exp.category, (categoryMap.get(exp.category) || 0) + exp.amount);
-    }
+  monthlyExpenses.forEach(exp => {
+    categoryMap.set(exp.category, (categoryMap.get(exp.category) || 0) + exp.amount);
   });
 
   const expensesByCategory = Array.from(categoryMap.entries())
@@ -95,6 +107,24 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
     }))
     .filter((entry) => entry.value > 0);
 
+  const previousMonthDate = new Date(currentYear, currentMonth - 2); // -2 porque getMonth() é zero-based
+  const previousYear = previousMonthDate.getFullYear();
+  const previousMonth = previousMonthDate.getMonth();
+
+  const previousRevenues = revenues.filter((r) => {
+    const date = parseLocalDate(r.date);
+    return date.getFullYear() === previousYear && date.getMonth() === previousMonth;
+  });
+
+  const previousExpenses = expenses.filter((e) => {
+    const date = parseLocalDate(e.date);
+    return date.getFullYear() === previousYear && date.getMonth() === previousMonth;
+  });
+
+  const previousRevenueTotal = previousRevenues.reduce((sum, r) => sum + r.amount, 0);
+  const previousExpenseTotal = previousExpenses.reduce((sum, e) => sum + e.amount, 0);
+  const previousProfit = previousRevenueTotal - previousExpenseTotal;
+  const previousMargin = previousRevenueTotal > 0 ? (previousProfit / previousRevenueTotal) * 100 : 0;
 
   return (
     <div className="space-y-8">
@@ -105,7 +135,10 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
         <Card className="p-6">
           <h3 className="text-sm font-medium">Total Receitas</h3>
           <p className="text-2xl font-bold text-green-400 mt-1">
-            {formatCurrency(locacaoRevenue + guinchoRevenue)}
+            {formatCurrency(totalRevenue)}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            {totalRevenue >= previousRevenueTotal ? '▲' : '▼'} {formatCurrency(totalRevenue - previousRevenueTotal)} vs mês anterior
           </p>
         </Card>
         <Card className="p-6">
@@ -113,11 +146,17 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
           <p className="text-2xl font-bold text-red-400 mt-1">
             {formatCurrency(locacaoExpense + guinchoExpense)}
           </p>
+          <p className="text-xs text-gray-500 mt-1">
+            {totalExpense >= previousExpenseTotal ? '▲' : '▼'} {formatCurrency(totalExpense - previousExpenseTotal)} vs mês anterior
+          </p>
         </Card>
         <Card className="p-6">
           <h3 className="text-sm font-medium">Lucro Total</h3>
           <p className="text-2xl font-bold text-blue-400 mt-1">
             {formatCurrency((locacaoRevenue + guinchoRevenue) - (locacaoExpense + guinchoExpense))}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">
+            {totalProfit >= previousProfit ? '▲' : '▼'} {formatCurrency(totalProfit - previousProfit)} vs mês anterior
           </p>
         </Card>
         <Card className="p-6">
@@ -125,18 +164,55 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
           <p className="text-2xl font-bold text-purple-400 mt-1">
             {totalMargin.toFixed(2)}%
           </p>
+          <p className="text-xs text-gray-500 mt-1">
+            {totalMargin >= previousMargin ? '▲' : '▼'} {(totalMargin - previousMargin).toFixed(2)} pts vs mês anterior
+          </p>
         </Card>
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-8">
-        <Card className="p-6">
-          <h3 className="text-xl font-semibol mb-6">Desempenho Mensal</h3>
+      {/* desempenho mensal */}
+      <Card className="p-6">
+        <h3 className="text-xl font-semibol mb-6">Desempenho Mensal</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={generateMonthlyData(revenues, expenses)}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis dataKey="month" stroke="#9CA3AF" />
+            <YAxis stroke="#9CA3AF" tickFormatter={(value) => formatCurrency(value)} />
+            <Tooltip
+              formatter={(value: number) => formatCurrency(value)}
+              contentStyle={{
+                backgroundColor: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                color: '#111827'
+              }}
+
+            />
+            <Bar dataKey="locacao" fill="#3B82F6" radius={4} />
+            <Bar dataKey="guincho" fill="#8B5CF6" radius={4} />
+          </BarChart>
+        </ResponsiveContainer>
+      </Card>
+
+      {/* Despesas por categoria */}
+      <Card className="flex flex-col p-6">
+        <h3 className="text-xl font-semibold mb-6">Despesas por Categoria</h3>
+        <div className="w-full">
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={generateMonthlyData(revenues, expenses)}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="month" stroke="#9CA3AF" />
-              <YAxis stroke="#9CA3AF" tickFormatter={(value) => formatCurrency(value)} />
+            <PieChart>
+              <Pie
+                data={expensesByCategory}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={150}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {expensesByCategory.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
               <Tooltip
                 formatter={(value: number) => formatCurrency(value)}
                 contentStyle={{
@@ -145,65 +221,32 @@ export function PerformanceView({ revenues, expenses }: PerformanceViewProps) {
                   borderRadius: '8px',
                   color: '#111827'
                 }}
-
               />
-              <Bar dataKey="locacao" fill="#3B82F6" radius={4} />
-              <Bar dataKey="guincho" fill="#8B5CF6" radius={4} />
-            </BarChart>
+            </PieChart>
           </ResponsiveContainer>
-        </Card>
+        </div>
 
-        <Card className="p-6">
-          <h3 className="text-xl font-semibold mb-6">Despesas por Categoria</h3>
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="w-full md:w-2/3">
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={expensesByCategory}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {expensesByCategory.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value: number) => formatCurrency(value)}
-                    contentStyle={{
-                      backgroundColor: '#ffffff',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      color: '#111827'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="flex flex-col md:flex-col justify-center md:w-1/3 space-y-2">
-              {expensesByCategory.map((entry, index) => {
-                const total = expensesByCategory.reduce((sum, e) => sum + e.value, 0);
-                const percent = ((entry.value / total) * 100).toFixed(0);
-                return (
-                  <div key={entry.name} className="flex items-center gap-2 text-sm text-gray-700">
+        <div className="flex flex-wrap justify-center gap-2 items-center space-y-2">
+          {expensesByCategory
+            .sort((a, b) => b.value - a.value)
+            .map((entry, index) => {
+              const total = expensesByCategory.reduce((sum, e) => sum + e.value, 0);
+              const percent = ((entry.value / total) * 100).toFixed(0);
+              return (
+                <div key={entry.name} className="flex items-center">
+                  <Badge variant="secondary" key={entry.name} className="flex items-center gap-2 text-sm text-gray-700 uppercase">
                     <div
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
                     <span className="font-medium">{entry.name}</span>
                     <span className="text-gray-500">— {percent}%</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </Card>
-      </div>
+                  </Badge>
+                </div>
+              );
+            })}
+        </div>
+      </Card>
 
       {/* Service Comparison */}
       <Card className="p-6">
