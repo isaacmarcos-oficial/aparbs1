@@ -1,7 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { formatCurrency } from '@/utils/financials';
-import { Expense, Revenue } from '@/types/transportsType';
+import { formatCurrency, getPaymentMethodName } from '@/utils/financials';
+import { categoriesLabels, Expense, getCategoriesName, Revenue } from '@/types/transportsType';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -107,6 +107,21 @@ export function PerformanceView({ revenues, expenses, selectedMonth }: Performan
     }))
     .filter((entry) => entry.value > 0);
 
+  const paymentMethodMap = new Map<string, number>();
+
+  monthlyRevenues.forEach(rev => {
+    const method = rev.paymentMethod ?? 'nao_informado';
+    paymentMethodMap.set(method, (paymentMethodMap.get(method) || 0) + rev.amount);
+  });
+
+  const revenuesByPaymentMethod = Array.from(paymentMethodMap.entries())
+    .map(([method, value], index) => ({
+      name: method,
+      value,
+      color: COLORS[index % COLORS.length]
+    }))
+    .filter((entry) => entry.value > 0);
+
   const previousMonthDate = new Date(currentYear, currentMonth - 2); // -2 porque getMonth() é zero-based
   const previousYear = previousMonthDate.getFullYear();
   const previousMonth = previousMonthDate.getMonth();
@@ -170,7 +185,7 @@ export function PerformanceView({ revenues, expenses, selectedMonth }: Performan
         </Card>
       </div>
 
-      {/* desempenho mensal */}
+      {/* Desempenho mensal */}
       <Card className="p-6">
         <h3 className="text-xl font-semibol mb-6">Desempenho Mensal</h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -214,7 +229,11 @@ export function PerformanceView({ revenues, expenses, selectedMonth }: Performan
                 ))}
               </Pie>
               <Tooltip
-                formatter={(value: number) => formatCurrency(value)}
+                formatter={(value: number, name: string) => [
+                  formatCurrency(value),
+                  getCategoriesName(name as keyof typeof categoriesLabels)
+                ]}
+
                 contentStyle={{
                   backgroundColor: '#ffffff',
                   border: '1px solid #e5e7eb',
@@ -239,7 +258,67 @@ export function PerformanceView({ revenues, expenses, selectedMonth }: Performan
                       className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
-                    <span className="font-medium">{entry.name}</span>
+                    <span className="font-medium">{getCategoriesName(entry.name as keyof typeof categoriesLabels)} {formatCurrency(entry.value)}</span>
+                    <span className="text-gray-500">— {percent}%</span>
+                  </Badge>
+                </div>
+              );
+            })}
+        </div>
+      </Card>
+
+      {/* Receita por forma de pagamento */}
+      <Card className="flex flex-col p-6">
+        <h3 className="text-xl font-semibold mb-6">Despesas por Forma de Pagamento</h3>
+        <div className="w-full">
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={revenuesByPaymentMethod}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={150}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {revenuesByPaymentMethod.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                // formatter={(value: number) => formatCurrency(value)}
+                formatter={(value: number, name: string) => [
+                  formatCurrency(value),
+                  getPaymentMethodName(name)
+                ]}
+                contentStyle={{
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  color: '#111827'
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="flex flex-wrap justify-center gap-2 items-center space-y-2">
+          {revenuesByPaymentMethod
+            .sort((a, b) => b.value - a.value)
+            .map((entry, index) => {
+              const total = revenuesByPaymentMethod.reduce((sum, e) => sum + e.value, 0);
+              const percent = ((entry.value / total) * 100).toFixed(0);
+              console.log(entry)
+              return (
+                <div key={entry.name} className="flex items-center">
+                  <Badge variant="secondary" key={entry.name} className="flex items-center gap-2 text-sm text-gray-700 uppercase">
+                    <div
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    />
+                    <span className="font-medium">{getPaymentMethodName(entry.name)}</span>
+                    <span className="font-medium">{formatCurrency(entry.value)}</span>
                     <span className="text-gray-500">— {percent}%</span>
                   </Badge>
                 </div>

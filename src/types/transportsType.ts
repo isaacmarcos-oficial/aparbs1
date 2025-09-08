@@ -1,16 +1,41 @@
 export type ServiceType = 'locacao' | 'guincho' | 'performance' | 'vehicles';
 
-export type PaymentMethod = 'dinheiro' | 'cartao_credito' | 'cartao_debito' | 'pix' | 'transferencia';
+export const categoriesLabels = {
+  combustivel: 'Combustível',
+  manutencao: 'Manutenção',
+  seguro: 'Seguro',
+  pedagio: 'Pedagio',
+  alimentacao: 'Alimentação',
+  servicos_terceiros: 'Serviços Terceiros',
+  rastreador: 'Rastreador',
+  financiamento: 'Financiamento',
+  impostos: 'Impostos',
+  salarios: 'Salários',
+  outros: 'Outros'
+};
+export type Categories = keyof typeof categoriesLabels;
+export const getCategoriesName = (category: keyof typeof categoriesLabels): string => {
+  return categoriesLabels[category];
+};
+export const categories = Object.keys(categoriesLabels) as (keyof typeof categoriesLabels)[];
 
-export type VehicleType = 'hilux' | 'voyage' | 'gol' | 'guincho';
-
+export const paymentMethodLabels = {
+  cartao_credito: 'Cartão de Crédito',
+  cartao_debito: 'Cartão de Débito',
+  transferencia: 'Transferência',
+  carteira: 'Carteira',
+  dinheiro: 'Dinheiro',
+  boleto: 'Boleto',
+  pix: 'PIX',
+} as const;
+export type PaymentMethod = keyof typeof paymentMethodLabels;
 
 export interface Revenue {
   id: string;
   date: string;
   osNumber: string;
   client: string;
-  vehicle: VehicleType;
+  vehicle: string;
   plate: string;
   paymentMethod: PaymentMethod;
   amount: number;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
-import { ServiceType, Revenue, Expense, VehicleType, PaymentMethod, Vehicles, } from '@/types/transportsType';
+import { ServiceType, Revenue, Expense, PaymentMethod, Vehicles, categories, getCategoriesName, } from '@/types/transportsType';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DialogTitle } from '@/components/ui/dialog';
+import { getPaymentMethodName, paymentMethods } from '@/utils/financials';
 
 type FinancialFormData = {
   date: string;
@@ -51,7 +52,7 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
       client: isRevenue ? (safeData as Revenue).client ?? '' : '',
       vehicle: safeData.vehicle ?? (service === 'locacao' ? 'hilux' : 'guincho'),
       plate: isRevenue ? (safeData as Revenue).plate ?? '' : '',
-      paymentMethod: isRevenue ? (safeData as Revenue).paymentMethod ?? 'dinheiro' : 'dinheiro',
+      paymentMethod: isRevenue ? (safeData as Revenue).paymentMethod ?? '' : '',
       amount: safeData.amount?.toString() ?? '',
       description: !isRevenue ? (safeData as Expense).description ?? '' : '',
       category: !isRevenue ? (safeData as Expense).category ?? '' : '',
@@ -72,9 +73,9 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
           date = '',
           osNumber = '',
           client = '',
-          vehicle = 'hilux',
+          vehicle = '',
           plate = '',
-          paymentMethod = 'dinheiro',
+          paymentMethod = '',
           amount = '',
         } = formData;
 
@@ -82,7 +83,7 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
           date,
           osNumber,
           client,
-          vehicle: vehicle as VehicleType,
+          vehicle,
           plate,
           paymentMethod: paymentMethod as PaymentMethod,
           amount: parseFloat(amount),
@@ -131,10 +132,6 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
   const serviceName = service === 'locacao' ? 'Locação' : 'Guincho';
 
   const activeVehicles = vehicles.filter(v => v.active === true);
-
-  const categories = ['combustivel', 'manutencao', 'seguro', 'impostos', 'salarios', 'outros'];
-
-  const paymentMethods = ['dinheiro', 'cartao', 'cheque', 'transferencia', 'pix', 'boleto', 'carteira'];
 
   return (
     <div className="">
@@ -275,7 +272,7 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
                           value={category}
                           className="uppercase"
                         >
-                          {category}
+                          {getCategoriesName(category)}
                         </SelectItem>
                       ))}
                     </SelectGroup>
@@ -320,7 +317,7 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
                       value={method}
                       className="uppercase"
                     >
-                      {method}
+                      {getPaymentMethodName(method)}
                     </SelectItem>
                   ))}
                 </SelectGroup>

@@ -1,4 +1,4 @@
-import { Expense, PaymentMethod, Revenue } from "@/types/transportsType";
+import { Expense, paymentMethodLabels, Revenue } from "@/types/transportsType";
 
 export const formatCurrency = (value: number): string => {
   if (!isFinite(value)) return 'R$ 0,00';
@@ -8,17 +8,16 @@ export const formatCurrency = (value: number): string => {
   }).format(value);
 };
 
-export const getPaymentMethodName = (method: PaymentMethod): string => {
-  const methods = {
-    dinheiro: 'Dinheiro',
-    cartao_credito: 'Cartão de Crédito',
-    cartao_debito: 'Cartão de Débito',
-    pix: 'PIX',
-    transferencia: 'Transferência',
-    carteira: 'Carteira'
-  };
-  return methods[method];
+// export const getPaymentMethodName = (method: keyof typeof paymentMethodLabels): string => {
+//   return paymentMethodLabels[method];
+// };
+
+export const getPaymentMethodName = (method: string): string => {
+  const label = paymentMethodLabels[method as keyof typeof paymentMethodLabels];
+  return label ?? 'Não informado';
 };
+
+export const paymentMethods = Object.keys(paymentMethodLabels) as (keyof typeof paymentMethodLabels)[];
 
 export const getCurrentMonthRevenues = (revenues: Revenue[], selectedMonth: string): Revenue[] => {
   return revenues.filter(revenue => revenue.date.slice(0, 7) === selectedMonth);
