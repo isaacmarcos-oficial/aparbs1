@@ -6,12 +6,13 @@ import { RevenueTable } from './revenueTable';
 import { ExpenseTable } from './expenseTable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreditCard, Receipt } from 'lucide-react';
+import { DateRange } from 'react-day-picker';
 
 interface ServiceViewProps {
   service: ServiceType;
   revenues: Revenue[];
   expenses: Expense[];
-  selectedMonth: string;
+  dateRange: DateRange | undefined;
   onAddRevenue: () => void;
   onAddExpense: () => void;
   onEditRevenue?: (revenue: Revenue) => void;
@@ -24,7 +25,7 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
   service,
   revenues,
   expenses,
-  selectedMonth,
+  dateRange,
   onAddRevenue,
   onAddExpense,
   onEditRevenue,
@@ -33,10 +34,10 @@ export const ServiceView: React.FC<ServiceViewProps> = ({
   onDeleteExpense,
 }) => (
   <div className='flex flex-col gap-8'>
-    <FinancialSummary expenses={expenses} revenues={revenues} service={service} selectedMonth={selectedMonth} />
+    <FinancialSummary expenses={expenses} revenues={revenues} service={service} dateRange={dateRange} />
 
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-      <MonthlyChart revenues={revenues} expenses={expenses} service={service} selectedMonth={selectedMonth} />
+      <MonthlyChart revenues={revenues} expenses={expenses} service={service} dateRange={dateRange}  />
 
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Ações Rápidas</h3>

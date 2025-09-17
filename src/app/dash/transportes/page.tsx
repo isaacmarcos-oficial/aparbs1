@@ -10,7 +10,8 @@ import { VehicleView } from "./_components/vehicleView";
 import { PerformanceView } from "./_components/performanceView";
 import { toast } from "sonner";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { MonthSelector } from "./_components/monthSelector";
+import { DateRange } from "react-day-picker";
+import Calendar23 from "@/components/calendar-23";
 
 export default function Page() {
   const [activeService, setActiveService] = useState<ServiceType>('locacao');
@@ -18,12 +19,7 @@ export default function Page() {
   const [editingRevenue, setEditingRevenue] = useState<Revenue | null>(null);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
   const [formType, setFormType] = useState<'receita' | 'despesa'>('receita');
-  const [selectedMonth, setSelectedMonth] = useState(() => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // mês começa em 0
-    return `${year}-${month}`; // formato "YYYY-MM"
-  });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
 
   const {
     revenues,
@@ -88,17 +84,23 @@ export default function Page() {
   const isPerformanceView = activeService === 'performance';
 
   const filteredRevenues = revenues.filter(revenue => {
-    const revenueMonth = revenue.date.slice(0, 7); // "YYYY-MM"
+    const revenueDate = new Date(revenue.date);
     const matchesService = isPerformanceView || revenue.service === activeService;
-    const matchesMonth = revenueMonth === selectedMonth;
-    return matchesService && matchesMonth;
+    const matchesRange =
+      dateRange?.from && dateRange?.to
+        ? revenueDate >= dateRange.from && revenueDate <= dateRange.to
+        : true;
+    return matchesService && matchesRange;
   });
 
   const filteredExpenses = expenses.filter(expense => {
-    const expenseMonth = expense.date.slice(0, 7); // "YYYY-MM"
+    const expenseDate = new Date(expense.date);
     const matchesService = isPerformanceView || expense.service === activeService;
-    const matchesMonth = expenseMonth === selectedMonth;
-    return matchesService && matchesMonth;
+    const matchesRange =
+      dateRange?.from && dateRange?.to
+        ? expenseDate >= dateRange.from && expenseDate <= dateRange.to
+        : true;
+    return matchesService && matchesRange;
   });
 
   const openForm = (type: 'receita' | 'despesa') => {
@@ -119,17 +121,17 @@ export default function Page() {
         setActiveService={(service: string) => setActiveService(service as ServiceType)}
       />
 
-      <MonthSelector
-        selectedMonth={selectedMonth}
-        onMonthChange={setSelectedMonth}
+      <Calendar23
+        range={dateRange}
+        setRange={setDateRange}
       />
 
       {isServiceView && (
         <ServiceView
+          dateRange={dateRange}
           service={activeService}
           revenues={filteredRevenues}
           expenses={filteredExpenses}
-          selectedMonth={selectedMonth}
           onAddRevenue={() => openForm('receita')}
           onAddExpense={() => openForm('despesa')}
           onEditRevenue={(revenue) => {
@@ -149,7 +151,7 @@ export default function Page() {
         <VehicleView
           expenses={expenses}
           revenues={revenues}
-          selectedMonth={selectedMonth}
+          dateRange={dateRange}
           toggleVehicleStatus={toggleVehicleStatus}
           vehicles={vehicles}
         />
@@ -159,7 +161,7 @@ export default function Page() {
         <PerformanceView
           revenues={revenues}
           expenses={expenses}
-          selectedMonth={selectedMonth}
+          dateRange={dateRange}
         />
       )}
 

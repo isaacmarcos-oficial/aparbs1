@@ -2,27 +2,36 @@ import React from 'react';
 import { BarChart3 } from 'lucide-react';
 import { Revenue, Expense, ServiceType } from '@/types/transportsType';
 import { formatCurrency, getMonthlyData } from '@/utils/financials';
+import { DateRange } from 'react-day-picker';
 
 interface MonthlyChartProps {
   revenues: Revenue[];
   expenses: Expense[];
   service: ServiceType;
-  selectedMonth: string
+  dateRange: DateRange | undefined;
 }
 
 export const MonthlyChart: React.FC<MonthlyChartProps> = ({
   revenues,
   expenses,
   service,
-  selectedMonth
+  dateRange
 }) => {
-  const filteredRevenues = service === 'performance'
-    ? revenues
-    : revenues.filter(rev => rev.service === service && rev.date.slice(0, 7) === selectedMonth);
+  const filteredRevenues = revenues.filter(rev => {
+    const matchesService = service === 'performance' || rev.service === service;
+    const matchesRange = dateRange?.from && dateRange?.to
+      ? new Date(rev.date) >= dateRange.from && new Date(rev.date) <= dateRange.to
+      : true;
+    return matchesService && matchesRange;
+  });
 
-  const filteredExpenses = service === 'performance'
-    ? expenses
-    : expenses.filter(exp => exp.service === service && exp.date.slice(0, 7) === selectedMonth);
+  const filteredExpenses = expenses.filter(exp => {
+    const matchesService = service === 'performance' || exp.service === service;
+    const matchesRange = dateRange?.from && dateRange?.to
+      ? new Date(exp.date) >= dateRange.from && new Date(exp.date) <= dateRange.to
+      : true;
+    return matchesService && matchesRange;
+  });
 
   const monthlyData = getMonthlyData(filteredRevenues, filteredExpenses);
 

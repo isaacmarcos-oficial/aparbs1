@@ -1,34 +1,35 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, DollarSign, Calculator } from 'lucide-react';
-import { formatCurrency, getCurrentMonthRevenues, getCurrentMonthExpenses } from '@/utils/financials';
+import { formatCurrency, getRevenuesInRange, getExpensesInRange } from '@/utils/financials';
 import { Expense, Revenue, ServiceType } from '@/types/transportsType';
 import { Card } from '@/components/ui/card';
+import { DateRange } from 'react-day-picker';
 
 interface FinancialSummaryProps {
   revenues: Revenue[];
   expenses: Expense[];
+  dateRange: DateRange | undefined;
   service: ServiceType;
-  selectedMonth: string;
 }
 
 export const FinancialSummary: React.FC<FinancialSummaryProps> = ({
   revenues,
   expenses,
+  dateRange,
   service,
-  selectedMonth
 }) => {
-  const monthlyRevenues = getCurrentMonthRevenues(revenues, selectedMonth);
-  const monthlyExpenses = getCurrentMonthExpenses(expenses, selectedMonth);
-  const totalRevenue = monthlyRevenues.reduce((sum: number, rev: { amount: number } ) => sum + rev.amount, 0);
+  const monthlyRevenues = getRevenuesInRange(revenues, dateRange);
+  const monthlyExpenses = getExpensesInRange(expenses, dateRange);
+  const totalRevenue = monthlyRevenues.reduce((sum: number, rev: { amount: number }) => sum + rev.amount, 0);
   const totalExpenses = monthlyExpenses.reduce((sum: number, exp: { amount: number }) => sum + exp.amount, 0);
   const profit = totalRevenue - totalExpenses;
 
   const serviceName =
-  service === 'performance'
-    ? 'Consolidado'
-    : service === 'locacao'
-    ? 'Locação'
-    : 'Guincho';
+    service === 'performance'
+      ? 'Consolidado'
+      : service === 'locacao'
+        ? 'Locação'
+        : 'Guincho';
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">

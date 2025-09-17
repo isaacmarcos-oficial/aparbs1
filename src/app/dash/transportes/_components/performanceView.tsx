@@ -1,48 +1,40 @@
-import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { formatCurrency, getPaymentMethodName } from '@/utils/financials';
 import { categoriesLabels, Expense, getCategoriesName, Revenue } from '@/types/transportsType';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { DateRange } from 'react-day-picker';
+import { ChartBar } from '@/components/ui/chart-bar';
+import { COLORS } from '@/utils/color';
+import { MetricCard } from './metricCard';
+import { generateMonthlyData, groupByCategory, groupByPaymentMethod, isInRange, parseLocalDate } from '@/utils/performanceUtils';
+import PieChartComponent from '@/components/PieChartComponent';
 
 interface PerformanceViewProps {
   revenues: Revenue[];
   expenses: Expense[];
-  selectedMonth: string;
+  dateRange: DateRange | undefined;
 }
 
-export function PerformanceView({ revenues, expenses, selectedMonth }: PerformanceViewProps) {
-  const [currentYear, currentMonth] = selectedMonth.split('-').map(Number);
+export function PerformanceView({ revenues, expenses, dateRange }: PerformanceViewProps) {
 
-  const parseLocalDate = (dateStr: string): Date => {
-    const [year, month, day] = dateStr.split('-').map(Number);
-    return new Date(year, month - 1, day);
-  };
-
-  const monthlyRevenues = revenues.filter((r) => {
-    const date = parseLocalDate(r.date);
-    return date.getFullYear() === currentYear && date.getMonth() === currentMonth - 1;
-  });
-
-  const monthlyExpenses = expenses.filter((e) => {
-    const date = parseLocalDate(e.date);
-    return date.getFullYear() === currentYear && date.getMonth() === currentMonth - 1;
-  });
+  // const [currentYear, currentMonth] = selectedMonth.split('-').map(Number);
+  const filteredRevenues = revenues.filter((r) => isInRange(r.date, dateRange));
+  const filteredExpenses = expenses.filter((e) => isInRange(e.date, dateRange));
 
   // Calculate totals for both services
-  const locacaoRevenue = monthlyRevenues
+  const locacaoRevenue = filteredRevenues
     .filter(r => r.service === 'locacao')
     .reduce((sum, r) => sum + r.amount, 0);
 
-  const guinchoRevenue = monthlyRevenues
+  const guinchoRevenue = filteredRevenues
     .filter(r => r.service === 'guincho')
     .reduce((sum, r) => sum + r.amount, 0);
 
-  const locacaoExpense = monthlyExpenses
+  const locacaoExpense = filteredExpenses
     .filter(e => e.service === 'locacao')
     .reduce((sum, e) => sum + e.amount, 0);
 
-  const guinchoExpense = monthlyExpenses
+  const guinchoExpense = filteredExpenses
     .filter(e => e.service === 'guincho')
     .reduce((sum, e) => sum + e.amount, 0);
 
@@ -51,51 +43,14 @@ export function PerformanceView({ revenues, expenses, selectedMonth }: Performan
   const totalProfit = totalRevenue - totalExpense;
   const totalMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
 
-  const generateMonthlyData = (revenues: Revenue[], expenses: Expense[]) => {
-    const months = [
-      'Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun',
-      'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'
-    ];
-
-    const monthlyMap = new Map<number, { locacao: number; guincho: number }>();
-
-    for (let i = 0; i < 12; i++) {
-      monthlyMap.set(i, { locacao: 0, guincho: 0 });
-    }
-
-    revenues.forEach((r) => {
-      const date = parseLocalDate(r.date);
-      const month = date.getMonth();
-      if (r.service === 'locacao' || r.service === 'guincho') {
-        monthlyMap.get(month)![r.service] += r.amount;
-      }
-    });
-
-    expenses.forEach((e) => {
-      const date = parseLocalDate(e.date);
-      const month = date.getMonth();
-      if (e.service === 'locacao' || e.service === 'guincho') {
-        monthlyMap.get(month)![e.service] -= e.amount;
-      }
-    });
-
-    return Array.from(monthlyMap.entries()).map(([monthIndex, values]) => ({
-      month: months[monthIndex],
-      locacao: values.locacao,
-      guincho: values.guincho,
-    }));
-  };
-
   const serviceComparison = [
     { name: 'Locação', receitas: locacaoRevenue, despesas: locacaoExpense },
     { name: 'Guincho', receitas: guinchoRevenue, despesas: guinchoExpense },
   ];
 
-  const COLORS = ['#ef4444', '#f97316', '#eab308', '#8b5cf6'];
-
   const categoryMap = new Map<string, number>();
 
-  monthlyExpenses.forEach(exp => {
+  filteredExpenses.forEach(exp => {
     categoryMap.set(exp.category, (categoryMap.get(exp.category) || 0) + exp.amount);
   });
 
@@ -109,37 +64,66 @@ export function PerformanceView({ revenues, expenses, selectedMonth }: Performan
 
   const paymentMethodMap = new Map<string, number>();
 
-  monthlyRevenues.forEach(rev => {
+  filteredRevenues.forEach(rev => {
     const method = rev.paymentMethod ?? 'nao_informado';
     paymentMethodMap.set(method, (paymentMethodMap.get(method) || 0) + rev.amount);
   });
 
-  const revenuesByPaymentMethod = Array.from(paymentMethodMap.entries())
-    .map(([method, value], index) => ({
-      name: method,
-      value,
-      color: COLORS[index % COLORS.length]
-    }))
-    .filter((entry) => entry.value > 0);
+  const getPreviousRange = (range: DateRange | undefined): DateRange | undefined => {
+    if (!range?.from || !range?.to) return undefined;
 
-  const previousMonthDate = new Date(currentYear, currentMonth - 2); // -2 porque getMonth() é zero-based
-  const previousYear = previousMonthDate.getFullYear();
-  const previousMonth = previousMonthDate.getMonth();
+    const from = new Date(range.from);
+    const to = new Date(range.to);
 
-  const previousRevenues = revenues.filter((r) => {
-    const date = parseLocalDate(r.date);
-    return date.getFullYear() === previousYear && date.getMonth() === previousMonth;
-  });
+    const diff = to.getTime() - from.getTime();
+    const previousFrom = new Date(from.getTime() - diff);
+    const previousTo = new Date(to.getTime() - diff);
 
-  const previousExpenses = expenses.filter((e) => {
-    const date = parseLocalDate(e.date);
-    return date.getFullYear() === previousYear && date.getMonth() === previousMonth;
-  });
+    return { from: previousFrom, to: previousTo };
+  };
+
+  const previousRange = getPreviousRange(dateRange);
+
+  const previousRevenues = revenues.filter((r) => isInRange(r.date, previousRange));
+  const previousExpenses = expenses.filter((e) => isInRange(e.date, previousRange));
+
+  // const previousMonthDate = new Date(currentYear, currentMonth - 2); // -2 porque getMonth() é zero-based
+  // const previousYear = previousMonthDate.getFullYear();
+  // const previousMonth = previousMonthDate.getMonth();
+
+  // const previousRevenues = revenues.filter((r) => {
+  //   const date = parseLocalDate(r.date);
+  //   return date.getFullYear() === previousYear && date.getMonth() === previousMonth;
+  // });
+
+  // const previousExpenses = expenses.filter((e) => {
+  //   const date = parseLocalDate(e.date);
+  //   return date.getFullYear() === previousYear && date.getMonth() === previousMonth;
+  // });
+
 
   const previousRevenueTotal = previousRevenues.reduce((sum, r) => sum + r.amount, 0);
   const previousExpenseTotal = previousExpenses.reduce((sum, e) => sum + e.amount, 0);
   const previousProfit = previousRevenueTotal - previousExpenseTotal;
   const previousMargin = previousRevenueTotal > 0 ? (previousProfit / previousRevenueTotal) * 100 : 0;
+
+  const locacaoExpenses = filteredExpenses.filter(e => e.service === 'locacao');
+  const guinchoExpenses = filteredExpenses.filter(e => e.service === 'guincho');
+  const locacaoRevenues = filteredRevenues.filter(r => r.service === 'locacao');
+  const guinchoRevenues = filteredRevenues.filter(r => r.service === 'guincho');
+
+  const locacaoByCategory = groupByCategory(locacaoExpenses, COLORS);
+  const guinchoByCategory = groupByCategory(guinchoExpenses, COLORS);
+  const locacaoByPaymentMethod = groupByPaymentMethod(locacaoRevenues, COLORS);
+  const guinchoByPaymentMethod = groupByPaymentMethod(guinchoRevenues, COLORS);
+  const totalByPaymentMethod = groupByPaymentMethod(filteredRevenues, COLORS);
+
+  const monthlyData = generateMonthlyData(revenues, expenses, parseLocalDate);
+
+  const seriesConfig = [
+    { key: 'locacao', label: 'Locação' },
+    { key: 'guincho', label: 'Guincho' }
+  ];
 
   return (
     <div className="space-y-8">
@@ -147,183 +131,87 @@ export function PerformanceView({ revenues, expenses, selectedMonth }: Performan
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card className="p-6">
-          <h3 className="text-sm font-medium">Total Receitas</h3>
-          <p className="text-2xl font-bold text-green-400 mt-1">
-            {formatCurrency(totalRevenue)}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            {totalRevenue >= previousRevenueTotal ? '▲' : '▼'} {formatCurrency(totalRevenue - previousRevenueTotal)} vs mês anterior
-          </p>
-        </Card>
-        <Card className="p-6">
-          <h3 className="text-sm font-medium">Total Despesas</h3>
-          <p className="text-2xl font-bold text-red-400 mt-1">
-            {formatCurrency(locacaoExpense + guinchoExpense)}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            {totalExpense >= previousExpenseTotal ? '▲' : '▼'} {formatCurrency(totalExpense - previousExpenseTotal)} vs mês anterior
-          </p>
-        </Card>
-        <Card className="p-6">
-          <h3 className="text-sm font-medium">Lucro Total</h3>
-          <p className="text-2xl font-bold text-blue-400 mt-1">
-            {formatCurrency((locacaoRevenue + guinchoRevenue) - (locacaoExpense + guinchoExpense))}
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            {totalProfit >= previousProfit ? '▲' : '▼'} {formatCurrency(totalProfit - previousProfit)} vs mês anterior
-          </p>
-        </Card>
-        <Card className="p-6">
-          <h3 className="text-sm font-medium">Margem</h3>
-          <p className="text-2xl font-bold text-purple-400 mt-1">
-            {totalMargin.toFixed(2)}%
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            {totalMargin >= previousMargin ? '▲' : '▼'} {(totalMargin - previousMargin).toFixed(2)} pts vs mês anterior
-          </p>
-        </Card>
+        <MetricCard
+          title="Total Receitas"
+          value={totalRevenue}
+          previousValue={previousRevenueTotal}
+          color="text-green-400"
+        />
+        <MetricCard
+          title="Total Despesas"
+          value={totalExpense}
+          previousValue={previousExpenseTotal}
+          color="text-red-400"
+        />
+        <MetricCard
+          title="Lucro Total"
+          value={totalProfit}
+          previousValue={previousProfit}
+          color="text-blue-400"
+        />
+        <MetricCard
+          title="Margem"
+          value={totalMargin}
+          previousValue={previousMargin}
+          unit="percent"
+          color="text-purple-400"
+        />
       </div>
 
       {/* Desempenho mensal */}
-      <Card className="p-6">
-        <h3 className="text-xl font-semibol mb-6">Desempenho Mensal</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={generateMonthlyData(revenues, expenses)}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="month" stroke="#9CA3AF" />
-            <YAxis stroke="#9CA3AF" tickFormatter={(value) => formatCurrency(value)} />
-            <Tooltip
-              formatter={(value: number) => formatCurrency(value)}
-              contentStyle={{
-                backgroundColor: '#ffffff',
-                border: '1px solid #e5e7eb',
-                borderRadius: '8px',
-                color: '#111827'
-              }}
-
-            />
-            <Bar dataKey="locacao" fill="#3B82F6" radius={4} />
-            <Bar dataKey="guincho" fill="#8B5CF6" radius={4} />
-          </BarChart>
-        </ResponsiveContainer>
-      </Card>
+      <ChartBar
+        title="Receita Líquida por Serviço"
+        data={monthlyData}
+        series={seriesConfig}
+      />
 
       {/* Despesas por categoria */}
-      <Card className="flex flex-col p-6">
-        <h3 className="text-xl font-semibold mb-6">Despesas por Categoria</h3>
-        <div className="w-full">
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={expensesByCategory}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={150}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {expensesByCategory.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip
-                formatter={(value: number, name: string) => [
-                  formatCurrency(value),
-                  getCategoriesName(name as keyof typeof categoriesLabels)
-                ]}
+      <Card className='p-6'>
+        <h3 className="text-xl font-semibold mb-6"> Despesas por categoria</h3>
 
-                contentStyle={{
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  color: '#111827'
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+          <PieChartComponent
+            title="Locação"
+            data={locacaoByCategory}
+            getLabel={(key) => getCategoriesName(key as keyof typeof categoriesLabels)}
+          />
 
-        <div className="flex flex-wrap justify-center gap-2 items-center space-y-2">
-          {expensesByCategory
-            .sort((a, b) => b.value - a.value)
-            .map((entry, index) => {
-              const total = expensesByCategory.reduce((sum, e) => sum + e.value, 0);
-              const percent = ((entry.value / total) * 100).toFixed(0);
-              return (
-                <div key={entry.name} className="flex items-center">
-                  <Badge variant="secondary" key={entry.name} className="flex items-center gap-2 text-sm text-gray-700 uppercase">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                    />
-                    <span className="font-medium">{getCategoriesName(entry.name as keyof typeof categoriesLabels)} {formatCurrency(entry.value)}</span>
-                    <span className="text-gray-500">— {percent}%</span>
-                  </Badge>
-                </div>
-              );
-            })}
+          <PieChartComponent
+            title="Guincho"
+            data={guinchoByCategory}
+            getLabel={(key) => getCategoriesName(key as keyof typeof categoriesLabels)}
+          />
+
+          <PieChartComponent
+            title="Total"
+            data={expensesByCategory}
+            getLabel={(key) => getCategoriesName(key as keyof typeof categoriesLabels)}
+          />
         </div>
       </Card>
 
       {/* Receita por forma de pagamento */}
-      <Card className="flex flex-col p-6">
-        <h3 className="text-xl font-semibold mb-6">Despesas por Forma de Pagamento</h3>
-        <div className="w-full">
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={revenuesByPaymentMethod}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={150}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {revenuesByPaymentMethod.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip
-                // formatter={(value: number) => formatCurrency(value)}
-                formatter={(value: number, name: string) => [
-                  formatCurrency(value),
-                  getPaymentMethodName(name)
-                ]}
-                contentStyle={{
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '8px',
-                  color: '#111827'
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+      <Card className='p-6'>
+        <h3 className="text-xl font-semibold mb-6">Receita por Forma de Pagamento</h3>
 
-        <div className="flex flex-wrap justify-center gap-2 items-center space-y-2">
-          {revenuesByPaymentMethod
-            .sort((a, b) => b.value - a.value)
-            .map((entry, index) => {
-              const total = revenuesByPaymentMethod.reduce((sum, e) => sum + e.value, 0);
-              const percent = ((entry.value / total) * 100).toFixed(0);
-              console.log(entry)
-              return (
-                <div key={entry.name} className="flex items-center">
-                  <Badge variant="secondary" key={entry.name} className="flex items-center gap-2 text-sm text-gray-700 uppercase">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                    />
-                    <span className="font-medium">{getPaymentMethodName(entry.name)}</span>
-                    <span className="font-medium">{formatCurrency(entry.value)}</span>
-                    <span className="text-gray-500">— {percent}%</span>
-                  </Badge>
-                </div>
-              );
-            })}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+          <PieChartComponent
+            title="Locação"
+            data={locacaoByPaymentMethod}
+            getLabel={getPaymentMethodName}
+          />
+
+          <PieChartComponent
+            title="Guincho"
+            data={guinchoByPaymentMethod}
+            getLabel={getPaymentMethodName}
+          />
+
+          <PieChartComponent
+            title="Total"
+            data={totalByPaymentMethod}
+            getLabel={getPaymentMethodName}
+          />
         </div>
       </Card>
 

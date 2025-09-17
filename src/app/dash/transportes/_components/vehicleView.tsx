@@ -6,21 +6,21 @@ import { Card } from '@/components/ui/card';
 import { Expense, Revenue, Vehicles } from '@/types/transportsType';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
+import { DateRange } from 'react-day-picker';
 
 interface VehicleViewProps {
   vehicles: Vehicles[];
   revenues: Revenue[];
   expenses: Expense[];
-  selectedMonth: string;
+  dateRange: DateRange | undefined;
   toggleVehicleStatus: (vehicleId: string, active: boolean) => void;
 }
 
-export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggleVehicleStatus }: VehicleViewProps) {
-  const [currentYear, currentMonth] = selectedMonth.split('-').map(Number);
+export function VehicleView({ vehicles, revenues, expenses, dateRange, toggleVehicleStatus }: VehicleViewProps) {
   const parseLocalDate = (dateStr: string): Date => {
-  const [year, month, day] = dateStr.split('-').map(Number);
-  return new Date(year, month - 1, day); // mês começa do zero
-};
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new Date(year, month - 1, day); // mês começa do zero
+  };
 
   // Revenues
   const getVehicleRevenue = (vehicleKey: string) => {
@@ -29,8 +29,8 @@ export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggl
         const revDate = parseLocalDate(rev.date);
         return (
           rev.vehicle === vehicleKey &&
-          revDate.getMonth() === currentMonth -1 &&
-          revDate.getFullYear() === currentYear
+          revDate >= (dateRange?.from ?? revDate) &&
+          revDate <= (dateRange?.to ?? revDate)
         );
       })
       .reduce((sum, rev) => sum + rev.amount, 0);
@@ -43,8 +43,8 @@ export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggl
         const expDate = parseLocalDate(exp.date);
         return (
           exp.vehicle === vehicleKey &&
-          expDate.getMonth() === currentMonth -1&&
-          expDate.getFullYear() === currentYear
+          expDate >= (dateRange?.from ?? expDate) &&
+          expDate <= (dateRange?.to ?? expDate)
         );
       })
       .reduce((sum, exp) => sum + exp.amount, 0);
@@ -56,8 +56,8 @@ export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggl
       const revDate = parseLocalDate(rev.date);
       return (
         rev.vehicle === vehicleKey &&
-        revDate.getMonth() === currentMonth -1 &&
-        revDate.getFullYear() === currentYear
+        revDate >= (dateRange?.from ?? revDate) &&
+        revDate <= (dateRange?.to ?? revDate)
       );
     }).length;
   };
@@ -72,8 +72,8 @@ export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggl
 
       if (
         rev.vehicle === vehicleKey &&
-        revDate.getMonth() === currentMonth -1 &&
-        revDate.getFullYear() === currentYear
+        revDate >= (dateRange?.from ?? revDate) &&
+        revDate <= (dateRange?.to ?? revDate)
       ) {
         dailyTotals.set(key, (dailyTotals.get(key) || 0) + rev.amount);
       }
@@ -85,12 +85,14 @@ export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggl
     return daysWithRevenue > 0 ? totalRevenue / daysWithRevenue : 0;
   };
 
+  // Lucro
   const getVehicleProfit = (vehicleKey: string) => {
     const revenue = getVehicleRevenue(vehicleKey);
     const expense = getVehicleExpenses(vehicleKey);
     return revenue - expense;
   };
 
+  // Margem
   const getVehicleMargin = (vehicleKey: string) => {
     const revenue = getVehicleRevenue(vehicleKey);
     const expense = getVehicleExpenses(vehicleKey);
@@ -100,7 +102,7 @@ export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggl
   return (
     <div className="">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold ">Gestão de Veículos</h3>
+        <h3 className="text-2xl font-semibold ">Gestão de Veículos</h3>
         <div className="items-center flex gap-2">
           <Badge className="bg-sky-500 p-2">
             {vehicles.filter(v => v.active === true).length} ativos
@@ -141,14 +143,14 @@ export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggl
 
               <div className="">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">OS no mês:</span>
+                  <span className="text-sm text-gray-400">OS no período:</span>
                   <span className="font-semibold text-blue-500">
                     {getVehicleOSCount(vehicleKey)}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">Receita do Mês:</span>
+                  <span className="text-sm text-gray-400">Receita do período:</span>
                   <div className={`${vehicle.active === true ? 'text-green-400' : 'text-zinc-400'} flex items-center space-x-1`}>
                     <TrendingUp className="w-3 h-3" />
                     <span className="font-semibold">
@@ -158,7 +160,7 @@ export function VehicleView({ vehicles, revenues, expenses, selectedMonth, toggl
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">Despesas do Mês:</span>
+                  <span className="text-sm text-gray-400">Despesas do período:</span>
                   <span className="font-semibold text-red-500">
                     {formatCurrency(getVehicleExpenses(vehicleKey))}
                   </span>
