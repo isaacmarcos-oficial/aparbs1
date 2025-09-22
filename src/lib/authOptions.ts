@@ -3,6 +3,7 @@ import { compare } from "bcryptjs";
 import { NextAuthOptions, Session, User } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import { createClient } from "@/utils/supabase/server";
+import { cookies } from "next/headers";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -13,7 +14,8 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Senha", type: "password" },
       },
       async authorize(credentials) {
-        const supabase = await createClient();
+        const cookieStore = await cookies()
+        const supabase = await createClient(cookieStore);
 
         const { data: users, error } = await supabase
           .from("users")

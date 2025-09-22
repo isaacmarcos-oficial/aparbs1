@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { PlusCircle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { createUser } from "../action";
+import { toast } from "sonner";
 
 interface UserFormData {
   name: string;
@@ -40,33 +42,18 @@ export function AddUserModal({ onUserCreated }: { onUserCreated?: () => void }) 
     setError(null);
 
     try {
-      const response = await fetch("/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          ...formData,
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Erro ao criar usuário");
-      }
-      setFormData({
-        name: "",
-        email: "",
-        role: "",
-        password: ""
-      });
-      setOpen(false);
-      if (onUserCreated) onUserCreated();
+      await createUser(formData) 
+      setFormData({ name: "", email: "", role: "", password: "" })
+      setOpen(false)
+      if (onUserCreated) onUserCreated()
+      toast.success("Usuário criado com sucesso!")
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Erro inesperado');
+      toast.error("Erro ao criar usuário")
+      setError(err instanceof Error ? err.message : "Erro inesperado")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
+
   }
 
   return (

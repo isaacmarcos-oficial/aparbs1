@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Pencil } from "lucide-react";
 import { User } from "@prisma/client";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { updateUser } from "../action";
+import { toast } from "sonner";
 
 interface EditUserSheetProps {
   user: User;
@@ -21,23 +23,18 @@ export function EditUserModal({ user, onUserUpdated }: EditUserSheetProps) {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const res = await fetch(`/api/users/${user.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, role }),
-      });
-
-      if (!res.ok) throw new Error("Erro ao atualizar usuário");
-
-      if (onUserUpdated) onUserUpdated();
+      await updateUser(user.id, { name, email, role }) // ✅ chamada direta
+      toast.success("Usuário atualizado com sucesso!")
+      if (onUserUpdated) onUserUpdated()
     } catch (err) {
-      console.error(err);
+      toast.error("Erro ao atualizar usuário")
+      console.error(err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <Dialog>
@@ -61,7 +58,7 @@ export function EditUserModal({ user, onUserUpdated }: EditUserSheetProps) {
           </div>
           <div className="space-y-2">
             <Label>Função</Label>
-            <Select value={role} onValueChange={(val) => setRole(val as User["role"]) }>
+            <Select value={role} onValueChange={(val) => setRole(val as User["role"])}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione a função" />
               </SelectTrigger>

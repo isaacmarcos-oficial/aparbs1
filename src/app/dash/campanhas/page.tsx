@@ -1,30 +1,10 @@
-"use client"
 import { AddCampaignModal } from "./_components/addCampaignModal"
 import { campaignColumns } from "./_components/campaignColumns"
 import { DataTable } from "@/components/data-table"
-import { useEffect, useState } from "react";
-import { Campaign } from "@/types/campaignTypes"
+import { getCampaign } from "./actions";
 
-
-export default function Page() {
-  const [campaignData, setCampaignData] = useState<Campaign[]>([]);
-
-  useEffect(() => {
-    fetch("/api/campaigns")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Erro ao buscar campanhas");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        // Considerando que sua API retorne um objeto { campaigns: [...] }
-        setCampaignData(data.campaigns || data);
-      })
-      .catch((err) => {
-        console.error("Erro ao buscar campanhas:", err);
-      });
-  }, []);
+export default async function Page() {
+  const campaign = await getCampaign()
 
   return (
     <div className="">
@@ -34,7 +14,7 @@ export default function Page() {
         </h1>
         <AddCampaignModal />
       </div>
-      <DataTable data={campaignData} columns={campaignColumns} />
+      <DataTable data={campaign} columns={campaignColumns} />
     </div>
   )
 }

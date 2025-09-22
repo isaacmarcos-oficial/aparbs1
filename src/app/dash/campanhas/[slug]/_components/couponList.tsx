@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu';
+import moment from 'moment';
 
 interface CouponListProps {
   coupons: CouponType[];
@@ -143,7 +144,8 @@ export function CouponList({
                     </Button>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {order.saleDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                    {moment(order.saleDate).format('DD/MM/YY ')}
+                    
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex">
