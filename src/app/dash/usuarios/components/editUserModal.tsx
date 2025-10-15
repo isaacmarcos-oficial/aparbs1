@@ -6,20 +6,20 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pencil } from "lucide-react";
-import { User } from "@prisma/client";
+import { user } from "@prisma/client";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { updateUser } from "../action";
 import { toast } from "sonner";
 
 interface EditUserSheetProps {
-  user: User;
+  user: user;
   onUserUpdated?: () => void;
 }
 
 export function EditUserModal({ user, onUserUpdated }: EditUserSheetProps) {
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
-  const [role, setRole] = useState<User["role"]>(user.role);
+  const [role, setRole] = useState<user["role"]>(user.role);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -58,7 +58,7 @@ export function EditUserModal({ user, onUserUpdated }: EditUserSheetProps) {
           </div>
           <div className="space-y-2">
             <Label>Função</Label>
-            <Select value={role} onValueChange={(val) => setRole(val as User["role"])}>
+            <Select value={role} onValueChange={(val) => setRole(val as user["role"])}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione a função" />
               </SelectTrigger>

@@ -14,7 +14,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'campaignId é obrigatório.' }, { status: 400 });
     }
 
-    const whereClause: Prisma.CouponWhereInput = { campaignId };
+    const whereClause: Prisma.couponWhereInput = { campaignId };
     if (eligibleOnly) {
       whereClause.isActive = true;
       whereClause.isWinner = false;

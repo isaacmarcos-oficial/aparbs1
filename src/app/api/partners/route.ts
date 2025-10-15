@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 // 📌 Método GET: Buscar todos os parceiros
 export async function GET() {
   try {
-    const partners = await prisma.partners.findMany();
+    const partners = await prisma.partner.findMany();
     return NextResponse.json(partners);
   } catch (error) {
     console.error("Erro ao buscar parceiros:", error);
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Nome e URL são obrigatórios" }, { status: 400 });
     }
 
-    const newPartner = await prisma.partners.create({
+    const newPartner = await prisma.partner.create({
       data: { name, url },
     });
 

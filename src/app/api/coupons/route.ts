@@ -48,7 +48,7 @@ export async function GET(req: Request) {
   const eligibleOnlyParam = searchParams.get('eligibleOnly');
 
   // Montamos o objeto `where` dinamicamente
-  const whereClause: Prisma.CouponWhereInput = {};
+  const whereClause: Prisma.couponWhereInput = {};
   if (cpf) {
     whereClause.cpf = cpf;
   }

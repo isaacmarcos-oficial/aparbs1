@@ -4,9 +4,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { ArrowUpDown } from "lucide-react"
 import { EditUserModal } from "./editUserModal"
-import { User } from "@prisma/client"
+import { user } from "@prisma/client"
 
-export const usersColumns: ColumnDef<User>[] = [
+export const usersColumns: ColumnDef<user>[] = [
   {
     id: "select",
     header: ({ table }) => (
