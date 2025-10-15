@@ -33,11 +33,11 @@ export type PaymentMethod = keyof typeof paymentMethodLabels;
 export interface Revenue {
   id: string;
   date: string;
-  osNumber: string;
+  osnumber: string;
   client: string;
   vehicle: string;
   plate: string;
-  paymentMethod: PaymentMethod;
+  paymentmethod: PaymentMethod;
   amount: number;
   service: ServiceType;
 }

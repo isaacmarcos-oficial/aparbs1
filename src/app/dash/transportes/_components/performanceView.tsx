@@ -65,7 +65,7 @@ export function PerformanceView({ revenues, expenses, dateRange }: PerformanceVi
   const paymentMethodMap = new Map<string, number>();
 
   filteredRevenues.forEach(rev => {
-    const method = rev.paymentMethod ?? 'nao_informado';
+    const method = rev.paymentmethod ?? 'nao_informado';
     paymentMethodMap.set(method, (paymentMethodMap.get(method) || 0) + rev.amount);
   });
 

@@ -8,38 +8,8 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-model user {
-  id        String   @id(map: "User_pkey") @default(uuid())
-  email     String   @unique(map: "User_email_key")
-  name      String
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  role      String
-}
-
-model partner {
-  id   String @id(map: "Partners_pkey") @default(cuid())
-  name String
-  url  String
-}
-
-model campaign {
-  id          String   @id(map: "Campaign_pkey") @default(cuid())
-  name        String
-  description String?
-  startDate   DateTime
-  endDate     DateTime
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  coupon      coupon[]
-
-  @@index([name], map: "Campaign_name_idx")
-}
-
 model coupon {
-  id               String    @id(map: "Coupon_pkey") @default(cuid())
+  id               String    @id @default(dbgenerated("gen_random_uuid()"))
   clientCode       String
   clientName       String
   orderNumber      String
@@ -52,53 +22,80 @@ model coupon {
   couponNumber     Int[]
   saleDate         DateTime
   campaignId       String?
-  campaign         campaign? @relation(fields: [campaignId], references: [id], map: "Coupon_campaignId_fkey")
+  campaign         campaign? @relation(fields: [campaignId], references: [id])
 
-  @@index([orderNumber, clientCode], map: "Coupon_orderNumber_clientCode_idx")
+  @@index([orderNumber, clientCode])
+}
+
+model campaign {
+  id          String   @id @default(dbgenerated("gen_random_uuid()"))
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  coupons     coupon[]
+
+  @@index([name])
+}
+
+model partners {
+  id   String @id @default(dbgenerated("gen_random_uuid()"))
+  name String
+  url  String
+}
+
+model user {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  email     String   @unique
+  name      String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role      String
 }
 
 model prize {
-  id          String   @id(map: "Prize_pkey") @default(cuid())
+  id          String   @id @default(dbgenerated("gen_random_uuid()"))
   name        String
   drawnNumber Int
   drawnAt     DateTime @default(now())
   couponId    String   @db.Uuid
   campaignId  String   @db.Uuid
 
-  @@index([campaignId], map: "Prize_campaignId_idx")
+  @@index([campaignId])
 }
 
-model expense {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  date        DateTime  @db.Date
-  description String?
-  category    String?
-  amount      Decimal?  @db.Decimal(10, 2)
-  service     String?
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime  @updatedAt
-  vehicle     String?
-}
-
-model revenue {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  date          DateTime  @db.Date
+model revenues {
+  id            String   @id @default(dbgenerated("gen_random_uuid()"))
+  date          String?
   osNumber      String?
   client        String?
   vehicle       String?
   plate         String?
-  paymentMethod String?
-  amount        Decimal?  @db.Decimal(10, 2)
+  paymentMethod String
+  amount        Float
   service       String?
-  createdAt     DateTime? @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
-model vehicle {
-  id        String   @id(map: "vehicle_pkey") @default(uuid())
-  model     String?
-  plate     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  active    Boolean?
+model expenses {
+  id          String   @id @default(dbgenerated("gen_random_uuid()"))
+  date        String?
+  description String?
+  category    String?
+  amount      Float
+  service     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model vehicles {
+  id     String  @id @default(dbgenerated("gen_random_uuid()"))
+  model  String
+  plate  String
+  active Boolean @default(true)
 }

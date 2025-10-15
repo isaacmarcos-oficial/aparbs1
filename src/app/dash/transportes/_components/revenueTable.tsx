@@ -49,7 +49,7 @@ export const RevenueTable: React.FC<RevenueTableProps> = ({ revenues, service, o
                   {moment(revenue.date).format('DD/MM/YYYY')}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  #{revenue.osNumber}
+                  #{revenue.osnumber}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {revenue.client}
@@ -73,7 +73,7 @@ export const RevenueTable: React.FC<RevenueTableProps> = ({ revenues, service, o
                     {formatCurrency(revenue.amount)}
                   </span>
                   <div className="text-xs text-gray-500">
-                    {getPaymentMethodName(revenue.paymentMethod)}
+                    {getPaymentMethodName(revenue.paymentmethod)}
                   </div>
                 </td>
                 <td className="flex items-center px-6 py-6 whitespace-nowrap gap-4">

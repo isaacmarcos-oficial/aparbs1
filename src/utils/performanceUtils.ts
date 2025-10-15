@@ -31,7 +31,7 @@ export const groupByCategory = (expenses: Expense[], colors: string[]) => {
 export const groupByPaymentMethod = (revenues: Revenue[], colors: string[]) => {
   const map = new Map<string, number>();
   revenues.forEach(rev => {
-    const method = rev.paymentMethod ?? 'nao_informado';
+    const method = rev.paymentmethod ?? 'nao_informado';
     map.set(method, (map.get(method) || 0) + rev.amount);
   });
   return Array.from(map.entries())

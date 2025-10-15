@@ -1,12 +1,12 @@
 import React from 'react';
-import { Car, Plus, TrendingUp } from 'lucide-react';
+import { Car, TrendingUp } from 'lucide-react';
 import { formatCurrency } from '@/utils/financials';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Expense, Revenue, Vehicles } from '@/types/transportsType';
 import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
 import { DateRange } from 'react-day-picker';
+import VehicleAdd from './vehicleAdd';
 
 interface VehicleViewProps {
   vehicles: Vehicles[];
@@ -107,9 +107,7 @@ export function VehicleView({ vehicles, revenues, expenses, dateRange, toggleVeh
           <Badge className="bg-sky-500 p-2">
             {vehicles.filter(v => v.active === true).length} ativos
           </Badge>
-          <Button size={'icon'} className='bg-green-500 hover:bg-green-600/80'>
-            <Plus className="w-4 h-4" />
-          </Button>
+          <VehicleAdd />
         </div>
       </div>
 

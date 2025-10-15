@@ -15,7 +15,7 @@ export async function getUsers() {
   const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
 
-  const { data, error } = await supabase.from("users").select()
+  const { data, error } = await supabase.from("user").select()
 
   if (error) {
     console.error("Erro ao buscar usuários:", error)
@@ -35,7 +35,7 @@ export async function createUser(formData: UserFormData) {
 
   // Verifica se o usuário já existe
   const { data: existing, error: findError } = await supabase
-    .from("users")
+    .from("user")
     .select("id")
     .eq("email", formData.email)
     .single()
@@ -51,7 +51,7 @@ export async function createUser(formData: UserFormData) {
   // Gera o hash da senha
   const hashedPassword = await hash(formData.password, 12)
 
-  const { error } = await supabase.from("users").insert([
+  const { error } = await supabase.from("user").insert([
     {
       name: formData.name,
       email: formData.email,
@@ -71,7 +71,7 @@ export async function updateUser(id: string, formData: UserFormData) {
   const supabase = createClient(cookieStore)
 
   const { error } = await supabase
-    .from("users")
+    .from("user")
     .update(formData)
     .eq("id", id)
 

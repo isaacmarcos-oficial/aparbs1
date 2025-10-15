@@ -7,7 +7,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
     const campaign = await prisma.campaign.findUnique({
       where: id,
-      include: { coupon: true },
+      include: { coupons: true },
     });
     if (!campaign) {
       return NextResponse.json({ error: 'Campanha não encontrada' }, { status: 404 });

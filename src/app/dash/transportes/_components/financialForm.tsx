@@ -13,11 +13,11 @@ import { getPaymentMethodName, paymentMethods } from '@/utils/financials';
 
 type FinancialFormData = {
   date: string;
-  osNumber?: string;
+  osnumber?: string;
   client?: string;
   vehicle?: string;
   plate?: string;
-  paymentMethod?: string;
+  paymentmethod?: string;
   amount: string;
   description?: string;
   category?: string;
@@ -48,11 +48,11 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
 
     return {
       date: safeData.date || new Date().toISOString().split('T')[0],
-      osNumber: isRevenue ? (safeData as Revenue).osNumber ?? '' : '',
+      osnumber: isRevenue ? (safeData as Revenue).osnumber ?? '' : '',
       client: isRevenue ? (safeData as Revenue).client ?? '' : '',
       vehicle: safeData.vehicle ?? (service === 'locacao' ? 'hilux' : 'guincho'),
       plate: isRevenue ? (safeData as Revenue).plate ?? '' : '',
-      paymentMethod: isRevenue ? (safeData as Revenue).paymentMethod ?? '' : '',
+      paymentmethod: isRevenue ? (safeData as Revenue).paymentmethod ?? '' : '',
       amount: safeData.amount?.toString() ?? '',
       description: !isRevenue ? (safeData as Expense).description ?? '' : '',
       category: !isRevenue ? (safeData as Expense).category ?? '' : '',
@@ -71,21 +71,21 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
       if (isRevenue) {
         const {
           date = '',
-          osNumber = '',
+          osnumber = '',
           client = '',
           vehicle = '',
           plate = '',
-          paymentMethod = '',
+          paymentmethod = '',
           amount = '',
         } = formData;
 
         await onSubmitRevenue({
           date,
-          osNumber,
+          osnumber,
           client,
           vehicle,
           plate,
-          paymentMethod: paymentMethod as PaymentMethod,
+          paymentmethod: paymentmethod as PaymentMethod,
           amount: parseFloat(amount),
           service,
         });
@@ -168,8 +168,8 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
                 <Input
                   type="text"
                   required
-                  value={formData.osNumber}
-                  onChange={(e) => updateFormData('osNumber', e.target.value)}
+                  value={formData.osnumber}
+                  onChange={(e) => updateFormData('osnumber', e.target.value)}
                   className=""
                   placeholder="Ex: 001"
                 />
@@ -302,8 +302,8 @@ export const FinancialForm: React.FC<FinancialFormProps> = ({
             </Label>
             <Select
               required
-              value={formData.paymentMethod}
-              onValueChange={(value) => updateFormData('paymentMethod', value)}
+              value={formData.paymentmethod}
+              onValueChange={(value) => updateFormData('paymentmethod', value)}
             >
               <SelectTrigger className='uppercase'>
                 <SelectValue placeholder="Selecione uma forma de pagamento" />
