@@ -40,7 +40,7 @@ export default function DialogProduct({ product }: DialogProductProps) {
             width={300}
             height={200}
             alt={`Imagem do produto ${product.name} da Vonixx para estética automotiva`}
-            className="flex justify-center max-h-60 md:max-h-full items-center object-contain"
+            className="flex justify-center max-h-80 items-center object-contain shadow-lg p-4"
           />
         </article>
 
@@ -51,7 +51,7 @@ export default function DialogProduct({ product }: DialogProductProps) {
               Descrição:
             </h2>
             <div className="max-h-24 overflow-auto mb-4 p-4 bg-muted rounded">
-              <p className="mb-4 font-light sm:mb-5">
+              <p className="mb-4 font-light sm:mb-5 text-sm">
                 {product.description}
               </p>
             </div>

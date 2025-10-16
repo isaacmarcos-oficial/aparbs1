@@ -8,12 +8,16 @@ export async function getCatalog() {
 
   const { data, error } = await supabase.from("catalog").select()
 
+  const sortedCatalog = (data || []).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
   if (error) {
     console.error("Erro ao buscar Catálogo:", error)
     return []
   }
 
-  return data ?? []
+  return sortedCatalog ?? []
 }
 
 export async function getCatalogById(id: string) {

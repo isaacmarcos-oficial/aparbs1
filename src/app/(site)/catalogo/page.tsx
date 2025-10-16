@@ -32,13 +32,13 @@ export default async function Catalogo() {
               alt={line.name}
               width={300}
               height={200}
-              className="w-16 max-h-12 object-contain"
+              className="w-16 h-16 max-w-12 max-h-12 object-contain"
             />
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {catalog.map((product: Catalog) => (
           <Dialog key={product.id}>
             <DialogTrigger asChild>

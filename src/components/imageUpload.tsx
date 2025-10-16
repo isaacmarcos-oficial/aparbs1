@@ -74,7 +74,7 @@ export function ImageUploader({ onChange, initialImageUrl }: FileInputProps) {
               alt="Preview"
               height={200}
               width={200}
-              className="rounded-md shadow-md object-contain mx-auto"
+              className="rounded-md max-w-48 p-2 max-h-48 shadow-md object-contain mx-auto"
             />
           ) : (
             <ImageDown className="mx-auto h-12 w-12 text-gray-300" />

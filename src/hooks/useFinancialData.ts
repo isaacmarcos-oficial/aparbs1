@@ -40,10 +40,14 @@ export const useFinancialData = () => {
           (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
         );
 
+        const sortedCatalog = (catalogRes.data || []).sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+
         setRevenues(sortedRevenues);
         setExpenses(sortedExpenses);
         setVehicles(vehiclesRes.data || []);
-        setCatalog(catalogRes.data || []);
+        setCatalog(sortedCatalog);
       } catch (err: unknown) {
         console.error('Erro ao carregar dados:', err);
         setError('Erro ao carregar dados');
@@ -277,25 +281,35 @@ export const useFinancialData = () => {
 
   // Update catalog
   const updateCatalog = async (id: string, updates: Partial<Catalog>) => {
-  try {
-    const supabase = createClient();
-    const { data, error } = await supabase
-      .from("catalog")
-      .update(updates)
-      .eq("id", id)
-      .select()
-      .single();
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("catalog")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
 
-    if (error || !data) throw error;
+      if (error || !data) throw error;
 
-    setCatalog(prev => prev.map(item => item.id === data.id ? data : item));
-    return data;
-  } catch (err) {
-    console.error("Erro ao atualizar produto:", err);
-    setError("Erro ao atualizar produto");
-    throw err;
-  }
-};
+      setCatalog(prev => prev.map(item => item.id === data.id ? data : item));
+      return data;
+    } catch (err) {
+      console.error("Erro ao atualizar produto:", err);
+      setError("Erro ao atualizar produto");
+      throw err;
+    }
+  };
+
+  const getUniqueBrands = () => {
+    const brands = catalog.map(item => item.marca?.trim().toLowerCase()).filter(Boolean);
+    return Array.from(new Set(brands));
+  };
+
+  const getUniqueCategories = () => {
+    const categories = catalog.map(item => item.category?.trim().toLowerCase()).filter(Boolean);
+    return Array.from(new Set(categories));
+  };
 
   // Refetch
   const refetch = async () => {
@@ -337,6 +351,8 @@ export const useFinancialData = () => {
     addExpense,
     addCatalog,
     updateCatalog,
+    getUniqueBrands,
+    getUniqueCategories,
     updateRevenue,
     updateExpense,
     deleteRevenue,

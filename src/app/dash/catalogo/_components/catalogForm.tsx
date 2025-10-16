@@ -15,14 +15,18 @@ import { toast } from "sonner";
 interface CatalogFormProps {
   initialData?: Catalog;
   trigger?: string;
+  onSubmit?: (updatedItem: Catalog) => void;
 }
 
-export default function CatalogForm({ initialData, trigger }: CatalogFormProps) {
+export default function CatalogForm({ initialData, trigger, onSubmit }: CatalogFormProps) {
   const isEditing = !!initialData;
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { addCatalog, updateCatalog } = useFinancialData();
-  
-  const [formData, setFormData] = useState<Partial<Catalog>>( initialData ?? {
+  const { addCatalog, updateCatalog, getUniqueBrands, getUniqueCategories } = useFinancialData();
+  const brandOptions = getUniqueBrands();
+  const categoryOptions = getUniqueCategories();
+
+  const [formData, setFormData] = useState<Partial<Catalog>>(initialData ?? {
     name: "",
     description: "",
     image: "",
@@ -49,16 +53,39 @@ export default function CatalogForm({ initialData, trigger }: CatalogFormProps) 
 
       const catalogData = {
         ...formData,
+        name: formData.name?.toUpperCase(),
+        category: formData.category?.toUpperCase(),
+        marca: formData.marca?.toUpperCase(),
         image: imageUrl,
       };
 
+      let result: Catalog;
+
       if (isEditing && initialData?.id) {
-        await updateCatalog(initialData.id.toString(), catalogData);
+        result = await updateCatalog(initialData.id.toString(), catalogData);
+        // await updateCatalog(initialData.id.toString(), catalogData);
         toast.success("Produto atualizado com sucesso!");
       } else {
-        await addCatalog(catalogData as Omit<Catalog, "id">);
+        result = await addCatalog(catalogData as Omit<Catalog, "id">);
+        // await addCatalog(catalogData as Omit<Catalog, "id">);
+        setFormData({
+          name: "",
+          description: "",
+          image: "",
+          category: "",
+          pesobruto: "",
+          pesoliquido: "",
+          metroscubicos: "",
+          altura: "",
+          largura: "",
+          profundidade: "",
+          marca: "",
+        });
         toast.success("Produto adicionado com sucesso!");
       }
+
+      onSubmit?.(result);
+      setOpen(false);
     } catch (err) {
       console.error("Erro ao salvar produto:", err);
       toast.error("Erro ao salvar produto");
@@ -67,12 +94,11 @@ export default function CatalogForm({ initialData, trigger }: CatalogFormProps) 
     }
   };
 
-
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button className="bg-green-500">
-          {trigger ? <Eye/> :  <Plus/> } 
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild className="">
+        <Button className="flex bg-green-500">
+          {trigger ? <Eye /> : <Plus />}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-3xl flex flex-col gap-4">
@@ -93,6 +119,7 @@ export default function CatalogForm({ initialData, trigger }: CatalogFormProps) 
               <div className="col-span-2">
                 <Label>Nome</Label>
                 <Input
+                  className="uppercase"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
@@ -112,17 +139,32 @@ export default function CatalogForm({ initialData, trigger }: CatalogFormProps) 
               <div>
                 <Label>Categoria</Label>
                 <Input
+                  className="uppercase"
+                  list="categoria-options"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                 />
+                <datalist id="categoria-options">
+                  {categoryOptions.map((category, index) => (
+                    <option key={index} value={category} />
+                  ))}
+                </datalist>
               </div>
 
               <div>
                 <Label>Marca</Label>
                 <Input
+                  className="uppercase"
+                  list="marca-options"
                   value={formData.marca}
                   onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
                 />
+                <datalist id="marca-options">
+                  {brandOptions.map((brand, index) => (
+                    <option key={index} value={brand} />
+                  ))}
+                </datalist>
+
               </div>
               <div>
                 <Label>Peso Bruto</Label>

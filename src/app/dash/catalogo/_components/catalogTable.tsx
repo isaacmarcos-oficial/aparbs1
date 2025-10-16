@@ -13,10 +13,21 @@ interface CatalogTableProps {
 }
 
 export default function CatalogTable({ catalog }: CatalogTableProps) {
+  const [catalogData, setCatalogData] = useState<Catalog[]>(catalog);
   const [selectedBrand, setSelectedBrand] = useState<string | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredCatalog = catalog.filter((product) => {
+  const handleRefresh = (updatedItem: Catalog) => {
+    setCatalogData(prev => {
+      const exists = prev.find(p => p.id === updatedItem.id);
+      if (exists) {
+        return prev.map(p => (p.id === updatedItem.id ? updatedItem : p));
+      }
+      return [...prev, updatedItem].sort((a, b) => a.name.localeCompare(b.name));
+    });
+  };
+
+  const filteredCatalog = catalogData.filter((product) => {
     const matchesBrand = selectedBrand && selectedBrand !== "all" ? product.marca?.toLowerCase() === selectedBrand : true;
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesBrand && matchesSearch;
@@ -50,7 +61,7 @@ export default function CatalogTable({ catalog }: CatalogTableProps) {
             </SelectContent>
           </Select>
 
-          <CatalogAdd />
+          <CatalogAdd onSubmit={handleRefresh} />
         </div>
       </div>
 
@@ -65,14 +76,14 @@ export default function CatalogTable({ catalog }: CatalogTableProps) {
         </TableHeader>
         <TableBody className="">
           {filteredCatalog.map((product) => (
-            <TableRow key={product.id} className="flex-wrap">
+            <TableRow key={product.id} className="">
               <TableCell className="flex  items-center gap-3">
                 <Image
-                  src={product.image || ""}
+                  src={product.image || "/placeholder.png"}
                   width={100}
                   height={100}
                   alt="V-mol"
-                  className="min-h-16 min-w-16 w-16 h-16 shadow-md object-contain"
+                  className="min-h-16 min-w-16 w-16 h-16 shadow-md object-contain p-2"
                 />
                 <h3 className="font-semibold">{product.name}</h3>
               </TableCell>
@@ -82,8 +93,8 @@ export default function CatalogTable({ catalog }: CatalogTableProps) {
               <TableCell className=" text-xs text-muted-foreground">
                 {product.marca || "Sem marca"}
               </TableCell>
-              <TableCell className=" flex items-center text-right justify-end gap-3">
-                <CatalogForm initialData={product} trigger="Editar" />
+              <TableCell className="flex  text-right justify-end items-center gap-3">
+                <CatalogForm initialData={product} trigger="Editar" onSubmit={handleRefresh} />
               </TableCell>
 
             </TableRow>
