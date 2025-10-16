@@ -1,15 +1,28 @@
+"use client"
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus } from "lucide-react";
+import { Eye, Plus } from "lucide-react";
 import { useState } from "react";
 import { Catalog } from "@/types/catalogTypes";
 import { ImageUploader } from "@/components/imageUpload";
+import { useFinancialData } from "@/hooks/useFinancialData";
+import { uploadToCloudinary } from "@/utils/cloudinary";
+import { toast } from "sonner";
 
-export default function CatalogAdd() {
-  const [formData, setFormData] = useState<Partial<Catalog>>({
+interface CatalogFormProps {
+  initialData?: Catalog;
+  trigger?: string;
+}
+
+export default function CatalogForm({ initialData, trigger }: CatalogFormProps) {
+  const isEditing = !!initialData;
+  const [loading, setLoading] = useState(false);
+  const { addCatalog, updateCatalog } = useFinancialData();
+  
+  const [formData, setFormData] = useState<Partial<Catalog>>( initialData ?? {
     name: "",
     description: "",
     image: "",
@@ -23,16 +36,43 @@ export default function CatalogAdd() {
     marca: "",
   })
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
-  }
+    setLoading(true);
+    try {
+      let imageUrl = formData.image;
+
+      // Se for base64, envia para o Cloudinary
+      if (imageUrl?.startsWith("data:image")) {
+        imageUrl = await uploadToCloudinary(imageUrl);
+      }
+
+      const catalogData = {
+        ...formData,
+        image: imageUrl,
+      };
+
+      if (isEditing && initialData?.id) {
+        await updateCatalog(initialData.id.toString(), catalogData);
+        toast.success("Produto atualizado com sucesso!");
+      } else {
+        await addCatalog(catalogData as Omit<Catalog, "id">);
+        toast.success("Produto adicionado com sucesso!");
+      }
+    } catch (err) {
+      console.error("Erro ao salvar produto:", err);
+      toast.error("Erro ao salvar produto");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button className="bg-green-500">
-          <Plus />
+          {trigger ? <Eye/> :  <Plus/> } 
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-3xl flex flex-col gap-4">
@@ -44,6 +84,10 @@ export default function CatalogAdd() {
                 initialImageUrl={formData.image ?? ""}
               />
             </div>
+
+            <DialogTitle className="text-2xl font-bold sr-only">
+              Adicionar Produto
+            </DialogTitle>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
@@ -129,7 +173,12 @@ export default function CatalogAdd() {
             <DialogClose>
               <Button className="w-24" variant="outline">Cancelar</Button>
             </DialogClose>
-            <Button className="w-24" type="submit">Salvar</Button>
+            <Button
+              disabled={loading}
+              className="w-24"
+              type="submit">
+              {loading ? "Salvando..." : "Salvar"}
+            </Button>
           </div>
         </form>
       </DialogContent>

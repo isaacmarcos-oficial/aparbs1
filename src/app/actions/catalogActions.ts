@@ -1,5 +1,6 @@
 import { cookies } from "next/headers"
 import { createClient } from "@/utils/supabase/server"
+import { Catalog } from "@/types/catalogTypes"
 
 export async function getCatalog() {
   const cookieStore = await cookies()
@@ -31,4 +32,9 @@ export async function getCatalogById(id: string) {
   }
 
   return data
+}
+
+export async function createCatalog(data: Partial<Catalog>) {
+  console.log("Dados recebidos para criação de catálogo:", data)
+  // Aqui futuramente você poderá fazer a inserção no Supabase
 }

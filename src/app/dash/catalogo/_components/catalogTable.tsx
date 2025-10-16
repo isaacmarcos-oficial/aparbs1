@@ -1,12 +1,12 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Eye } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import CatalogAdd from "./catalogAdd";
+import CatalogAdd from "./catalogForm";
 import { Catalog } from "@/types/catalogTypes";
+import CatalogForm from "./catalogForm";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 interface CatalogTableProps {
   catalog: Catalog[];
@@ -24,7 +24,7 @@ export default function CatalogTable({ catalog }: CatalogTableProps) {
 
   return (
     <div>
-      <div className="flex justify-between gap-6 shadow-md p-4 rounded-xl">
+      <div className="flex justify-between gap-6 shadow-md p-4 rounded-xl max-w-7xl mx-auto">
         <div className="w-full md:w-1/2">
           <Input
             placeholder="Buscar"
@@ -54,27 +54,42 @@ export default function CatalogTable({ catalog }: CatalogTableProps) {
         </div>
       </div>
 
-      <div className="my-4">
-        {filteredCatalog.map((product) => (
-          <div key={product.id} className="flex justify-between gap-6 border-b p-4  h-20">
-            <div className="flex w-full md:w-1/2 items-center gap-3">
-              <Image
-                src={product.image || ""}
-                width={100}
-                height={100}
-                alt="V-mol"
-                className="w-16 h-16 shadow-md object-contain"
-              />
-              <h3 className="font-semibold">{product.name}</h3>
-            </div>
-            <div className="flex items-center gap-3">
-              <Button className="bg-green-500">
-                <Eye />
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
+      <Table className=" my-6 shadow-lg rounded-xl max-w-7xl mx-auto">
+        <TableHeader className="bg-muted text-primary rounded-xl">
+          <TableRow className="text-primary font-bold">
+            <TableHead className="w-1/5">Produto</TableHead>
+            <TableHead className="w-1/5">Categoria</TableHead>
+            <TableHead className="w-1/5">Marca</TableHead>
+            <TableHead className="w-1/5 text-right">Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className="">
+          {filteredCatalog.map((product) => (
+            <TableRow key={product.id} className="flex-wrap">
+              <TableCell className="flex  items-center gap-3">
+                <Image
+                  src={product.image || ""}
+                  width={100}
+                  height={100}
+                  alt="V-mol"
+                  className="min-h-16 min-w-16 w-16 h-16 shadow-md object-contain"
+                />
+                <h3 className="font-semibold">{product.name}</h3>
+              </TableCell>
+              <TableCell className=" text-xs text-muted-foreground">
+                {product.category || "Sem categoria"}
+              </TableCell>
+              <TableCell className=" text-xs text-muted-foreground">
+                {product.marca || "Sem marca"}
+              </TableCell>
+              <TableCell className=" flex items-center text-right justify-end gap-3">
+                <CatalogForm initialData={product} trigger="Editar" />
+              </TableCell>
+
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   )
 }

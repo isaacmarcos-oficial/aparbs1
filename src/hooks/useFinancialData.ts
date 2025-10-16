@@ -251,6 +251,52 @@ export const useFinancialData = () => {
     }
   };
 
+  // Add catalog
+  const addCatalog = async (catalogItem: Omit<Catalog, 'id'>) => {
+    console.log("catalogItem", catalogItem)
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('catalog')
+        .insert(catalogItem)
+        .select()
+        .single();
+
+      if (error || !data) throw error;
+
+      setCatalog(prev => [data, ...prev]);
+      toast.success('Produto adicionado ao catálogo com sucesso!');
+      return data;
+    } catch (err) {
+      console.error('Erro ao adicionar produto ao catálogo:', err);
+      setError('Erro ao adicionar produto ao catálogo');
+      toast.error('Erro ao adicionar produto ao catálogo');
+      throw err;
+    }
+  };
+
+  // Update catalog
+  const updateCatalog = async (id: string, updates: Partial<Catalog>) => {
+  try {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("catalog")
+      .update(updates)
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error || !data) throw error;
+
+    setCatalog(prev => prev.map(item => item.id === data.id ? data : item));
+    return data;
+  } catch (err) {
+    console.error("Erro ao atualizar produto:", err);
+    setError("Erro ao atualizar produto");
+    throw err;
+  }
+};
+
   // Refetch
   const refetch = async () => {
     setLoading(true);
@@ -289,6 +335,8 @@ export const useFinancialData = () => {
     error,
     addRevenue,
     addExpense,
+    addCatalog,
+    updateCatalog,
     updateRevenue,
     updateExpense,
     deleteRevenue,
