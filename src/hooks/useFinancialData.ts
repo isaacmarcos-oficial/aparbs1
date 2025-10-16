@@ -1,12 +1,15 @@
+"use client";
 import { useState, useEffect } from 'react';
 import { Expense, Revenue, Vehicles } from '@/types/transportsType';
 import { createClient } from '@/utils/supabase/client';
 import { toast } from 'sonner';
+import { Catalog } from '@/types/catalogTypes';
 
 export const useFinancialData = () => {
   const [revenues, setRevenues] = useState<Revenue[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [vehicles, setVehicles] = useState<Vehicles[]>([]);
+  const [catalog, setCatalog] = useState<Catalog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,10 +21,11 @@ export const useFinancialData = () => {
 
         const supabase = createClient();
 
-        const [revenuesRes, expensesRes, vehiclesRes] = await Promise.all([
+        const [revenuesRes, expensesRes, vehiclesRes, catalogRes] = await Promise.all([
           supabase.from('revenues').select('*'),
           supabase.from('expenses').select('*'),
           supabase.from('vehicles').select('*'),
+          supabase.from('catalog').select('*'),
         ]);
 
         if (revenuesRes.error || expensesRes.error || vehiclesRes.error) {
@@ -39,6 +43,7 @@ export const useFinancialData = () => {
         setRevenues(sortedRevenues);
         setExpenses(sortedExpenses);
         setVehicles(vehiclesRes.data || []);
+        setCatalog(catalogRes.data || []);
       } catch (err: unknown) {
         console.error('Erro ao carregar dados:', err);
         setError('Erro ao carregar dados');
@@ -252,17 +257,21 @@ export const useFinancialData = () => {
     try {
       const supabase = createClient();
 
-      const [revenuesRes, expensesRes] = await Promise.all([
+      const [revenuesRes, expensesRes, vehiclesRes, catalogRes] = await Promise.all([
         supabase.from('revenues').select('*'),
         supabase.from('expenses').select('*'),
+        supabase.from('vehicles').select('*'),
+        supabase.from('catalog').select('*'),
       ]);
 
-      if (revenuesRes.error || expensesRes.error) {
+      if (revenuesRes.error || expensesRes.error || vehiclesRes.error) {
         throw new Error('Erro ao buscar dados do Supabase');
       }
 
       setRevenues(revenuesRes.data || []);
       setExpenses(expensesRes.data || []);
+      setVehicles(vehiclesRes.data || []);
+      setCatalog(catalogRes.data || []);
     } catch (err: unknown) {
       console.error('Erro ao recarregar dados:', err);
       setError('Erro ao recarregar dados');
@@ -274,6 +283,7 @@ export const useFinancialData = () => {
   return {
     revenues,
     expenses,
+    catalog,
     loading,
     vehicles,
     error,

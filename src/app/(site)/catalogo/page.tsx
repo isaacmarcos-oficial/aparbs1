@@ -2,48 +2,15 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import CardProduct from "./_components/cardProduct";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import DialogProduct from "./_components/dialogProduct";
-import { products } from "./_components/mockProduct";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
+import { getCatalog } from "@/app/actions/catalogActions";
+import { Catalog } from "@/types/catalogTypes";
+import { VonixxLines } from "@/app/actions/campaignActions";
 
-export interface Product {
-  id: number;
-  name: string;
-  image?: string;
-  category?: string;
-  description?: string;
-  pesoBruto?: string
-  pesoLiquido?: string
-  metrosCubicos?: string
-  altura?: string
-  largura?: string
-  profundidade?: string
-}
+export default async function Catalogo() {
+  const catalog = await getCatalog()
 
-const VonixxLines = [
-  {
-    id: 1,
-    url: "https://res.cloudinary.com/diqaqpm8y/image/upload/VONIXX_dcnufr.jpg",
-    name: "Vonixx"
-  },
-  {
-    id: 2,
-    url: "https://res.cloudinary.com/diqaqpm8y/image/upload/RAZUX_al0c2k.jpg",
-    name: "Razux"
-  },
-  {
-    id: 3,
-    url: "https://res.cloudinary.com/diqaqpm8y/image/upload/ZACS_em90mr.jpg",
-    name: "Zacs"
-  },
-  {
-    id: 4,
-    url: "https://res.cloudinary.com/diqaqpm8y/image/upload/v1760464601/VINTEX_j8x7lz.jpg",
-    name: "Vintex"
-  }
-]
-
-export default function Catalogo() {
   return (
     <div className='flex flex-col p-4 gap-6 w-full max-w-7xl m-auto'>
       <div className="flex relative bg-[url(https://res.cloudinary.com/diqaqpm8y/image/upload/shutterstock_571427833-copy-1_ylazao.png)] bg-no-repeat bg-cover bg-[#000000e9] h-[300px] justify-center items-center rounded-2xl">
@@ -72,12 +39,12 @@ export default function Catalogo() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {products.map((product) => (
+        {catalog.map((product: Catalog) => (
           <Dialog key={product.id}>
             <DialogTrigger asChild>
               <CardProduct product={product} />
             </DialogTrigger>
-            <DialogContent className="">
+            <DialogContent className="max-w-4xl">
               <DialogProduct product={product} />
             </DialogContent>
           </Dialog>

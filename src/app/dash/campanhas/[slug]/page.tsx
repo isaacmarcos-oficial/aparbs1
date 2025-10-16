@@ -1,5 +1,5 @@
+import { getCampaignById } from "@/app/actions/campaignActions";
 import { CouponClient } from "./_components/couponClient";
-import { getCampaignById } from "../actions";
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

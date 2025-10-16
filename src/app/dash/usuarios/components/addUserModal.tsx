@@ -15,8 +15,8 @@ import { Input } from "@/components/ui/input";
 import { PlusCircle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { createUser } from "../action";
 import { toast } from "sonner";
+import { createUser } from "@/app/actions/usersActions";
 
 interface UserFormData {
   name: string;

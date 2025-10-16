@@ -1,19 +1,19 @@
 "use client"
 import { Card } from "@/components/ui/card"
-import { Product } from "../page"
 import { Button } from "@/components/ui/button"
 import { ShoppingBag } from "lucide-react"
 import Image from "next/image"
+import { Catalog } from "@/types/catalogTypes"
 
 interface DialogProductProps {
-  product: Product
+  product: Catalog
 }
 export default function DialogProduct({ product }: DialogProductProps) {
 
   const specs = [
-    { label: "Peso bruto", value: product.pesoBruto },
-    { label: "Peso líquido", value: product.pesoLiquido },
-    { label: "Metros Cúbicos", value: product.metrosCubicos },
+    { label: "Peso bruto", value: product.pesobruto },
+    { label: "Peso líquido", value: product.pesoliquido },
+    { label: "Metros Cúbicos", value: product.metroscubicos },
     { label: "Altura", value: product.altura },
     { label: "Largura", value: product.largura },
     { label: "Profundidade", value: product.profundidade },

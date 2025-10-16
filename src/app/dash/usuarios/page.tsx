@@ -1,7 +1,7 @@
 import { AddUserModal } from "./components/addUserModal";
 import { DataTable } from "@/components/data-table";
 import { usersColumns } from "./components/usersColumns";
-import { getUsers } from "./action";
+import { getUsers } from "@/app/actions/usersActions";
 
 export default async function Page() {
   const users = await getUsers()

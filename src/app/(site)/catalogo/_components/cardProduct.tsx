@@ -1,9 +1,9 @@
 import { Card } from "@/components/ui/card";
-import { Product } from "../page";
+import { Catalog } from "@/types/catalogTypes";
 import Image from "next/image";
 
 interface CardProductProps {
-  product: Product
+  product: Catalog
 }
 
 export default function CardProduct({ product }: CardProductProps) {

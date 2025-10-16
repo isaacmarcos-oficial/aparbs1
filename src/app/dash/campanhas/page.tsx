@@ -1,7 +1,7 @@
+import { getCampaign } from "@/app/actions/campaignActions"
 import { AddCampaignModal } from "./_components/addCampaignModal"
 import { campaignColumns } from "./_components/campaignColumns"
 import { DataTable } from "@/components/data-table"
-import { getCampaign } from "./actions";
 
 export default async function Page() {
   const campaign = await getCampaign()
