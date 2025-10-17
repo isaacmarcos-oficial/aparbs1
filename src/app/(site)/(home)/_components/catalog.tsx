@@ -26,10 +26,10 @@ export default function VonixxBanner() {
             <div className="container mx-auto px-6 md:px-12">
               <div className="max-w-2xl space-y-6">
                 {/* Main Heading */}
-                <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight text-balance">
+                <h2 className="text-4xl md:text-5xl font-bold text-white leading-tight text-balance">
                   SOMOS
                   <span className="block text-amber-400 mt-2 font-black">DISTRIBUIDOR OFICIAL VONIXX</span>
-                </h1>
+                </h2>
 
                 {/* Description */}
                 <p className="text-lg md:text-lg text-white/90 leading-relaxed max-w-xl text-pretty">

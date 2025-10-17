@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import Head from "next/head";
 
 interface CatalogoProps {
   searchParams: Promise<{
@@ -20,9 +21,14 @@ interface CatalogoProps {
   }>;
 }
 
+<Head>
+  <title>Catálogo de Produtos Vonixx | Zacs, Vintex e Razux</title>
+  <meta name="description" content="Explore o catálogo profissional da Vonixx, Zacs, Vintex e Razux. Produtos de alta performance para estética automotiva." />
+  <meta name="keywords" content="Vonixx, Zacs, Vintex, Razux, estética automotiva, catálogo de produtos, polidores, ceras, APC, detalhamento automotivo" />
+</Head>
+
 export default async function Catalogo({ searchParams }: CatalogoProps) {
   const params = await searchParams;
-
   const termo = params?.termo?.toLowerCase() || "";
   const marca = params?.marca?.toLowerCase() || "";
 
@@ -44,13 +50,13 @@ export default async function Catalogo({ searchParams }: CatalogoProps) {
       {/* Banner */}
       <div className="flex relative bg-[url(https://res.cloudinary.com/diqaqpm8y/image/upload/shutterstock_571427833-copy-1_ylazao.png)] bg-no-repeat bg-cover bg-[#000000e9] h-[300px] justify-center items-center rounded-2xl">
         <h1 className="text-white shadow-2xl text-center text-4xl font-bold mt-8">
-          Conheça nossos Produtos
+          Catálogo de Produtos Vonixx
         </h1>
       </div>
 
       {/* Texto de apresentação */}
       <Card className="text-center text-white w-full p-6 bg-zinc-950">
-        Este catálogo apresenta exclusivamente os produtos das marcas <strong>Vonixx</strong>, <strong>Zacs</strong>, <strong>Vintex</strong> e <strong>Razux</strong>, voltado para o público profissional e parceiros comerciais. Não representa o portfólio completo de todos os produtos disponíveis da <strong>APARBS</strong>.
+        Explore nossa linha de produtos profissionais para detalhamento automotivo. Este catálogo inclui itens das marcas <strong>Vonixx</strong>, <strong>Zacs</strong>, <strong>Vintex</strong> e <strong>Razux</strong>, como ceras, polidores, APCs, shampoos e muito mais. Ideal para profissionais de estética automotiva e parceiros comerciais.
       </Card>
 
       {/* LINHAS VONIXX */}

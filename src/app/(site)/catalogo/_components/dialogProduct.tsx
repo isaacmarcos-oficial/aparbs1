@@ -27,7 +27,7 @@ export default function DialogProduct({ product }: DialogProductProps) {
   }
 
   return (
-    <div className="flex flex-col" key={product.id}>
+    <div className="flex flex-col" key={product.id} aria-label={`Detalhes do produto ${product.name}`}>
       <div className="flex items-center justify-between p-4 border-b rounded-t ">
         <p className="text-xl font-semibold">
           {product.name}
@@ -36,6 +36,7 @@ export default function DialogProduct({ product }: DialogProductProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
         <article className="flex h-full justify-center items-center">
           <Image
+            title={`Produto ${product.name} - ${product.marca}`}
             src={product.image || ""}
             width={300}
             height={200}
