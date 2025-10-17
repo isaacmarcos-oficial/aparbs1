@@ -1,17 +1,22 @@
 
 import ProgressBar from "@/components/progressBar";
-import { Wrench } from "lucide-react";
+import Image from "next/image";
 
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-zinc-950 to-zinc-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-b flex items-center justify-center p-4">
       <div className="text-center">
-        <div className="relative">
-          <Wrench className="w-24 h-24 text-[#d90000] animate-spin" />
-          <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/90 to-transparent blur-sm -z-10" />
+        <div className="">
+          <Image
+            src="/car-engine.gif"
+            width={500}
+            height={500}
+            alt="logo da APARBS Soluções Automotivas"
+          />
+          {/* <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/90 to-transparent blur-sm -z-10" /> */}
         </div>
 
-        <h1 className="mt-8 text-3xl font-bold text-white">
+        <h1 className="mt-8 text-3xl font-bold ">
           Carregando
           <span className="inline-flex ml-2">
             <span className="animate-bounce">.</span>
@@ -20,14 +25,14 @@ export default function Loading() {
           </span>
         </h1>
 
-        <p className="mt-4 text-zinc-400 max-w-md mx-auto">
+        <p className="mt-4  max-w-md mx-auto">
           Preparando as ferramentas para melhor atendê-lo
         </p>
 
         {/* Progress Bar */}
         <ProgressBar />
 
-        <div className="mt-12 text-zinc-500 text-sm">
+        <div className="mt-12  text-sm">
           <p>APARBS Soluções Automotivas</p>
         </div>
       </div>

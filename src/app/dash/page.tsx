@@ -1,11 +1,14 @@
-export default async function Page() {
+"use client"
+import { useSession } from "next-auth/react"
+
+export default function Page() {
+  const { data: session } = useSession()
+  const user = session?.user
 
   return (
-    <div className="flex flex-1 flex-col">
-      <div className="@container/main flex flex-1 flex-col gap-2">
-        <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-          <h1 className="text-2xl font-bold">EM BREVE</h1>
-        </div>
+    <div className="flex flex-1 flex-col w-full h-full">
+      <div className="mx-auto my-auto">
+        <h1 className="text-2xl font-bold w-full h-full text-center ">Olá, <span className="text-red-500">{user?.name}</span>! <br /> Bem vindo ao painel administrativo</h1>
       </div>
     </div>
   )

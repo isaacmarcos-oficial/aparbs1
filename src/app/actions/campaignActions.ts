@@ -5,7 +5,7 @@ export const VonixxLines = [
   {
     id: 1,
     url: "https://res.cloudinary.com/diqaqpm8y/image/upload/VONIXX_dcnufr.jpg",
-    name: "Vonixx"
+    name: "Vonixx",
   },
   {
     id: 2,
