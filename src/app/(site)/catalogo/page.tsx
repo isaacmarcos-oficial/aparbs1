@@ -25,6 +25,10 @@ interface CatalogoProps {
   <title>Catálogo de Produtos Vonixx | Zacs, Vintex e Razux</title>
   <meta name="description" content="Explore o catálogo profissional da Vonixx, Zacs, Vintex e Razux. Produtos de alta performance para estética automotiva." />
   <meta name="keywords" content="Vonixx, Zacs, Vintex, Razux, estética automotiva, catálogo de produtos, polidores, ceras, APC, detalhamento automotivo" />
+  <meta property="og:title" content="Vonixx em Porteirinha MG | Catálogo APARBS" />
+  <meta property="og:description" content="Confira os produtos Vonixx disponíveis na APARBS em Porteirinha, MG. Estética automotiva profissional." />
+  <meta property="og:image" content="https://www.aparbs.com.br/imagens/vonixx-banner.jpg" />
+  <meta property="og:url" content="https://www.aparbs.com.br/catalogo" />
 </Head>
 
 export default async function Catalogo({ searchParams }: CatalogoProps) {

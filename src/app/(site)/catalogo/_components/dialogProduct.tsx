@@ -1,9 +1,10 @@
 "use client"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ShoppingBag } from "lucide-react"
+import { ArrowRight, ShoppingBag } from "lucide-react"
 import Image from "next/image"
 import { Catalog } from "@/types/catalogTypes"
+import Link from "next/link"
 
 interface DialogProductProps {
   product: Catalog
@@ -67,15 +68,32 @@ export default function DialogProduct({ product }: DialogProductProps) {
             ))}
           </section>
 
-          <Button
-            className="w-full font-semibold"
-            size="lg"
-            onClick={handleBudget}
-            aria-label={`Solicitar orçamento para ${product.name}`}
-          >
-            <ShoppingBag className="w-5 h-5" />
-            Solicitar orçamento
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              className="w-full font-semibold"
+              size="lg"
+              onClick={handleBudget}
+              aria-label={`Solicitar orçamento para ${product.name}`}
+            >
+              <ShoppingBag className="w-5 h-5" />
+              Solicitar orçamento
+            </Button>
+
+            <Link
+              href={`/catalogo/${product.slug}`}
+              aria-label={`Ver detalhes do produto ${product.name}`}
+            >
+              <Button
+                className="w-full font-semibold"
+                size="lg"
+                aria-label={`Solicitar orçamento para ${product.name}`}
+              >
+                <ArrowRight className="w-5 h-5" />
+                Página do produto
+              </Button>
+            </Link>
+          </div>
+
         </div>
       </div>
     </div>

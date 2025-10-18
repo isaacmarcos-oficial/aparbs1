@@ -23,7 +23,7 @@ export async function RelatedProducts({ category, currentProductId }: RelatedPro
             <p className="text-muted-foreground mt-2">Outros produtos da categoria {category}</p>
           </div>
           <Button variant="outline" asChild className="hidden sm:flex bg-transparent">
-            <Link href={`/categoria/${category.toLowerCase()}`}>Ver todos</Link>
+            <Link href={`/catalogo/${category.toLowerCase()}`}>Ver todos</Link>
           </Button>
         </div>
 

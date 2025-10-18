@@ -96,3 +96,12 @@ export const scannerAutomotivo = [
   "Análise de códigos de falha e sugestões de reparo",
   "Geração de relatório técnico detalhado"
 ]
+
+export const geometriaSuspensao = [
+  "Alinhamento da direção com equipamentos computadorizados",
+  "Balanceamento das rodas para eliminar vibrações",
+  "Verificação e correção de cambagem",
+  "Rodízio de pneus para desgaste uniforme",
+  "Inspeção da suspensão e componentes de direção",
+  "Ajuste técnico conforme especificações do fabricante"
+]

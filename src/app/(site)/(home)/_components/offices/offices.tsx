@@ -8,10 +8,11 @@ import {
   FaSprayCan,
   FaWrench,
 } from "react-icons/fa";
+import { PiTireFill } from "react-icons/pi";
 import { SiAlwaysdata } from "react-icons/si";
 import { FaCarTunnel } from "react-icons/fa6";
 import { BsTruckFlatbed } from "react-icons/bs";
-import { arCondicionado, autoPecas, autoSocorro, eletrica, injecao, limpezaBico, locacaoVeiculo, mecanicaGeral, salaEspera, scannerAutomotivo, trocaOleo } from "./officesList";
+import { arCondicionado, autoPecas, autoSocorro, eletrica, geometriaSuspensao, injecao, limpezaBico, locacaoVeiculo, mecanicaGeral, salaEspera, scannerAutomotivo, trocaOleo } from "./officesList";
 import Image from "next/image";
 import OfficeModal from "./officeModal";
 import Link from "next/link";
@@ -89,6 +90,13 @@ export default function Offices() {
               description="Veículos disponíveis para alugar com conforto, segurança e flexibilidade."
               checklist={locacaoVeiculo}
             />
+            <OfficeModal
+              serviceIcon={<PiTireFill />}
+              title="Geometria e Suspensão"
+              description="Serviços de alinhamento, balanceamento, cambagem e rodízio de pneus"
+              checklist={geometriaSuspensao}
+            />
+
             <OfficeModal
               serviceIcon={<FaCouch />}
               title="Sala de espera"

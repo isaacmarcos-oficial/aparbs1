@@ -36,7 +36,7 @@ export default function OfficeModal({ title, serviceIcon, description, checklist
         </div>
       </DialogTrigger>
 
-      <DialogContent id="dialog-element" color="gray.800" >
+      <DialogContent id="dialog-element" color="gray.800" className="max-w-xl" >
         <DialogTitle className="text-[#d90000] font-bold">
           {title}
         </DialogTitle>
