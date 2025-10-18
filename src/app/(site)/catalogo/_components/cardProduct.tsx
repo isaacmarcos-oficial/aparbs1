@@ -18,9 +18,7 @@ export default function CardProduct({ product }: CardProductProps) {
 
   return (
     <Card
-      title={`Ver detalhes do produto ${product.name}`}
       className="flex flex-col p-4 gap-2 cursor-pointer hover:scale-105 transition relative"
-      aria-label={`Produto ${product.name} da marca ${product.marca}`}
     >
       {/* Badge da marca */}
       {brandLogo && (
@@ -41,7 +39,7 @@ export default function CardProduct({ product }: CardProductProps) {
         src={product.image || "/placeholder.png"}
         width={300}
         height={200}
-        alt={`Imagem do produto ${product.name} da marca ${product.marca}`}
+        alt={`Produto ${product.name} da marca ${product.marca} disponível na APARBS em Porteirinha MG`}
         className="w-full h-40 object-contain"
       />
       <h3 className="font-bold text-center text-sm mt-2">{product.name}</h3>

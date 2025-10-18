@@ -17,5 +17,7 @@ export async function uploadToCloudinary(base64Image: string) {
     throw new Error(data.error?.message || "Erro ao enviar imagem para o Cloudinary");
   }
 
-  return data.secure_url as string;
+  const webpUrl = data.secure_url.replace("/upload/", "/upload/f_webp/")
+  return webpUrl
+  // return data.secure_url as string;
 }

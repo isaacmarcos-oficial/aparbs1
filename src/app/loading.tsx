@@ -8,7 +8,7 @@ export default function Loading() {
       <div className="text-center">
         <div className="">
           <Image
-            src="/car-engine.gif"
+            src="/car-engine-ezgif.com-gif-to-webp-converter.webp"
             width={500}
             height={500}
             alt="logo da APARBS Soluções Automotivas"

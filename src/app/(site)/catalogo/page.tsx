@@ -52,10 +52,19 @@ export default async function Catalogo({ searchParams }: CatalogoProps) {
   return (
     <div className='flex flex-col p-4 gap-6 w-full max-w-7xl m-auto'>
       {/* Banner */}
-      <div className="flex relative bg-[url(https://res.cloudinary.com/diqaqpm8y/image/upload/shutterstock_571427833-copy-1_ylazao.png)] bg-no-repeat bg-cover bg-[#000000e9] h-[300px] justify-center items-center rounded-2xl">
-        <h1 className="text-white shadow-2xl text-center text-4xl font-bold mt-8">
-          Catálogo de Produtos Vonixx
-        </h1>
+      <div className="relative h-[300px] w-full rounded-2xl overflow-hidden">
+        <Image
+          src="https://res.cloudinary.com/diqaqpm8y/image/upload/f_webp/shutterstock_571427833-copy-1_ylazao.png"
+          alt="Catálogo de Produtos Vonixx"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-[#00000075] flex justify-center items-center">
+          <h1 className="text-white shadow-2xl text-center text-4xl font-bold mt-8">
+            Catálogo de Produtos Vonixx
+          </h1>
+        </div>
       </div>
 
       {/* Texto de apresentação */}
@@ -120,7 +129,11 @@ export default async function Catalogo({ searchParams }: CatalogoProps) {
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
         {filteredCatalog.map((product: Catalog) => (
           <Dialog key={product.id}>
-            <DialogTrigger asChild>
+            <DialogTrigger
+              asChild
+              aria-label={`Produto ${product.name} da marca ${product.marca}`}
+              role="button"
+            >
               <CardProduct product={product} />
             </DialogTrigger>
             <DialogContent className="max-w-4xl">
