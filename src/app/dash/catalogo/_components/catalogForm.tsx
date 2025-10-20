@@ -48,7 +48,7 @@ export default function CatalogForm({ initialData, trigger, onSubmit }: CatalogF
 
       // Se for base64, envia para o Cloudinary
       if (imageUrl?.startsWith("data:image")) {
-        imageUrl = await uploadToCloudinary(imageUrl);
+        imageUrl = await uploadToCloudinary(imageUrl, "catalog");
       }
 
       const catalogData = {

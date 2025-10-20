@@ -1,10 +1,11 @@
-export async function uploadToCloudinary(base64Image: string) {
+export async function uploadToCloudinary(base64Image: string, folder: string) {
   const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
   const uploadPreset = "aparbssite"
 
   const formData = new FormData();
   formData.append("file", base64Image);
   formData.append("upload_preset", uploadPreset);
+  formData.append("folder", folder);
 
   const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
     method: "POST",
