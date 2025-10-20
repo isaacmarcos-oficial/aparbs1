@@ -7,6 +7,7 @@ export interface Post {
   };
   title: string;
   content: string;
+  updatedAt: string;
 }
 
 export interface Partner {
