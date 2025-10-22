@@ -18,9 +18,26 @@ export interface Partner {
   }
 }
 
+export interface Service {
+  id: string;
+  slug: string;
+  title: string;
+  icon: string
+  shortdescription: string;
+  introduction: string;
+  whatis: string;
+  whatinvolves: string
+  whydo: string
+  whentodo: string;
+  howwedo: string;
+  whychooseus: string;
+  faq: string
+}
+
 export interface DatoResponse {
   allPosts: Post[];
   post: Post;
+  allServices: Service[]
+  service: Service
   allPartners: Partner[]
 }
-

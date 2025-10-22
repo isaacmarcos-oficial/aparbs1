@@ -2,19 +2,30 @@ import type { MetadataRoute } from 'next'
 import { getCatalog } from './actions/catalogActions'
 import { DatoResponse, Post } from '@/types/postTypes'
 import { client } from '@/lib/datoClient'
-import { GET_POSTS } from '@/lib/datoQueries'
+import { GET_POSTS, GET_SERVICES } from '@/lib/datoQueries'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
   const catalog = await getCatalog()
   let posts: Post[] = []
+  let services: { slug: string; updatedAt?: string }[] = []
 
   try {
-    const data: DatoResponse = await client.request(GET_POSTS)
-    posts = data?.allPosts || []
+    const dataServices: DatoResponse = await client.request(GET_SERVICES)
+    const dataPosts: DatoResponse = await client.request(GET_POSTS)
+    
+    posts = dataPosts?.allPosts || []
+    services = dataServices?.allServices || []
   } catch (error) {
-    console.error('Erro ao buscar posts:', error)
+    console.error('Erro ao buscar os dados:', error)
   }
+
+  const serviceRoutes: MetadataRoute.Sitemap = services.map((service) => ({
+    url: `https://aparbs.com.br/servicos/${service.slug}`,
+    lastModified: service.updatedAt ? new Date(service.updatedAt) : now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }))
 
   const catalogRoutes = catalog.map((item) => ({
     url: `https://aparbs.com.br/catalogo/${item.slug}`,
@@ -40,6 +51,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1,
     },
     {
+      url: 'https://aparbs.com.br/servicos',
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.5,
+    },
+    {
       url: 'https://aparbs.com.br/blog',
       lastModified: now,
       changeFrequency: 'weekly',
@@ -53,5 +70,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  return [ ...staticRoutes, ...catalogRoutes, ...postRoutes ]
+  return [...staticRoutes, ...catalogRoutes, ...postRoutes, ...serviceRoutes]
 }

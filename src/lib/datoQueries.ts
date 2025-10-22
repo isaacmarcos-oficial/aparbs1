@@ -34,6 +34,46 @@ export const GET_POST_BY_ID = `
   }
 `;
 
+export const GET_SERVICES = `
+  query {
+    allServices {
+      id
+      slug
+      title
+      icon
+      shortdescription
+      introduction
+      whatis
+      whatinvolves
+      whydo
+      whentodo
+      howwedo
+      whychooseus  
+      faq
+    }
+  }
+`;
+
+export const GET_SERVICES_BY_SLUG = `
+  query ServiceBySlug($slug: String!) {
+    service(filter: {slug: {eq: $slug}}) {
+      id
+      slug
+      title
+      icon
+      shortdescription
+      introduction
+      whatis
+      whatinvolves
+      whydo
+      whentodo
+      howwedo
+      whychooseus  
+      faq
+    }
+  }
+`;
+
 export const GET_PARTNERS = `
   query {
     allPartners {
