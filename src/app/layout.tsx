@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { SessionProvider } from "./providers/sessionProvider";
+import PinterestTag from "@/scripts/pinterest";
 
 export const metadata: Metadata = {
   title: "APARBS Soluções Automotivas",
@@ -39,6 +40,7 @@ export const metadata: Metadata = {
     icon: "/favicon.svg",
   },
   metadataBase: new URL("https://aparbs.com.br"),
+  
 };
 
 export default function RootLayout({
@@ -50,6 +52,8 @@ export default function RootLayout({
     <html lang="pt-br">
       <head>
         <link rel="icon" href="/favicon.svg" />
+        <meta name="p:domain_verify" content="a24bcf3aa1f4022da19ed07711a44925"/>
+        <PinterestTag />
       </head>
       <body className="">
         <SessionProvider>
