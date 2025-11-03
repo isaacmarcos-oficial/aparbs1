@@ -7,6 +7,7 @@ import { MercadoLivreBanner } from "./_components/mercadoLivreBanner";
 import Offices from "./_components/offices/offices";
 import Partners from "./_components/partners";
 import Rent from "./_components/rent";
+import Review from "./_components/review";
 
 export default function Homepage() {
   return (
@@ -15,6 +16,7 @@ export default function Homepage() {
       <Destaque />
       <About />
       <Offices />
+      <Review />
       <Rent />
       <VonixxBanner />
       <MercadoLivreBanner />

@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
       { hostname: "www.aparbs.com.br" },
       { hostname: "www.datocms-assets.com" },
       { hostname: "picsum.photos" },
+      { hostname: "lh3.googleusercontent.com" },
     ]
   },
   // async redirects() {
