@@ -34,10 +34,17 @@ export interface Service {
   faq: string
 }
 
+export interface Vacancy {
+  id: string;
+  title: string;
+  link: string
+}
+
 export interface DatoResponse {
   allPosts: Post[];
   post: Post;
   allServices: Service[]
   service: Service
   allPartners: Partner[]
+  allVacancies: Vacancy[]
 }

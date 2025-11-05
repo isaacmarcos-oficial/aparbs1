@@ -85,3 +85,13 @@ export const GET_PARTNERS = `
     }
   }
 `;
+
+export const GET_VACANCY = `
+  query {
+    allVacancies {
+      id
+      title
+      link
+    }
+  }
+`;
