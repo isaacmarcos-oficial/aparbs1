@@ -55,7 +55,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" />
         <meta name="p:domain_verify" content="a24bcf3aa1f4022da19ed07711a44925"/>
         <PinterestTag />
-        <GoogleAnalytics gaId="G-0SQS4GSY2S" />
+        <GoogleAnalytics gaId="G-WJ87825878" />
       </head>
       <body className="">
         <SessionProvider>
